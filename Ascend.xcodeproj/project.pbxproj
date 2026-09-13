@@ -1,0 +1,397 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		1B0000010000000000000001 /* AscendApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B0000010000000000000101 /* AscendApp.swift */; };
+		1B0000010000000000000002 /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B0000010000000000000102 /* AppState.swift */; };
+		1B0000010000000000000003 /* MainTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B0000010000000000000103 /* MainTabView.swift */; };
+		1B0000010000000000000004 /* UserProfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B0000010000000000000104 /* UserProfile.swift */; };
+		1B0000010000000000000005 /* WorkoutModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B0000010000000000000105 /* WorkoutModels.swift */; };
+		1B0000010000000000000006 /* NutritionModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B0000010000000000000106 /* NutritionModels.swift */; };
+		1B0000010000000000000007 /* DisciplineModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B0000010000000000000107 /* DisciplineModels.swift */; };
+		1B0000010000000000000008 /* OnboardingCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B0000010000000000000108 /* OnboardingCalculator.swift */; };
+		1B0000010000000000000009 /* RoutineGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B0000010000000000000109 /* RoutineGenerator.swift */; };
+		1B000001000000000000000A /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B000001000000000000010A /* Theme.swift */; };
+		1B000001000000000000000B /* GlassCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B000001000000000000010B /* GlassCard.swift */; };
+		1B000001000000000000000C /* RestTimerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B000001000000000000010C /* RestTimerView.swift */; };
+		1B000001000000000000000D /* OnboardingFlowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B000001000000000000010D /* OnboardingFlowView.swift */; };
+		1B000001000000000000000E /* DashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B000001000000000000010E /* DashboardView.swift */; };
+		1B000001000000000000000F /* WorkoutListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B000001000000000000010F /* WorkoutListView.swift */; };
+		1B0000010000000000000010 /* ActiveWorkoutPlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B0000010000000000000110 /* ActiveWorkoutPlayerView.swift */; };
+		1B0000010000000000000011 /* ExerciseDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B0000010000000000000111 /* ExerciseDetailView.swift */; };
+		1B0000010000000000000012 /* DietAndPortionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B0000010000000000000112 /* DietAndPortionView.swift */; };
+		1B0000010000000000000013 /* SupplementHubView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B0000010000000000000113 /* SupplementHubView.swift */; };
+		1B0000010000000000000014 /* AnalyticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B0000010000000000000114 /* AnalyticsView.swift */; };
+		1B0000010000000000000015 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1B0000010000000000000115 /* Assets.xcassets */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		1B0000010000000000000101 /* AscendApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "App/AscendApp.swift"; sourceTree = "<group>"; };
+		1B0000010000000000000102 /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "App/AppState.swift"; sourceTree = "<group>"; };
+		1B0000010000000000000103 /* MainTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "App/MainTabView.swift"; sourceTree = "<group>"; };
+		1B0000010000000000000104 /* UserProfile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Models/UserProfile.swift"; sourceTree = "<group>"; };
+		1B0000010000000000000105 /* WorkoutModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Models/WorkoutModels.swift"; sourceTree = "<group>"; };
+		1B0000010000000000000106 /* NutritionModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Models/NutritionModels.swift"; sourceTree = "<group>"; };
+		1B0000010000000000000107 /* DisciplineModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Models/DisciplineModels.swift"; sourceTree = "<group>"; };
+		1B0000010000000000000108 /* OnboardingCalculator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Services/OnboardingCalculator.swift"; sourceTree = "<group>"; };
+		1B0000010000000000000109 /* RoutineGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Services/RoutineGenerator.swift"; sourceTree = "<group>"; };
+		1B000001000000000000010A /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DesignSystem/Theme.swift"; sourceTree = "<group>"; };
+		1B000001000000000000010B /* GlassCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DesignSystem/GlassCard.swift"; sourceTree = "<group>"; };
+		1B000001000000000000010C /* RestTimerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DesignSystem/RestTimerView.swift"; sourceTree = "<group>"; };
+		1B000001000000000000010D /* OnboardingFlowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Onboarding/OnboardingFlowView.swift"; sourceTree = "<group>"; };
+		1B000001000000000000010E /* DashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Dashboard/DashboardView.swift"; sourceTree = "<group>"; };
+		1B000001000000000000010F /* WorkoutListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Workouts/WorkoutListView.swift"; sourceTree = "<group>"; };
+		1B0000010000000000000110 /* ActiveWorkoutPlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Workouts/ActiveWorkoutPlayerView.swift"; sourceTree = "<group>"; };
+		1B0000010000000000000111 /* ExerciseDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Workouts/ExerciseDetailView.swift"; sourceTree = "<group>"; };
+		1B0000010000000000000112 /* DietAndPortionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Nutrition/DietAndPortionView.swift"; sourceTree = "<group>"; };
+		1B0000010000000000000113 /* SupplementHubView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Nutrition/SupplementHubView.swift"; sourceTree = "<group>"; };
+		1B0000010000000000000114 /* AnalyticsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Analytics/AnalyticsView.swift"; sourceTree = "<group>"; };
+		1B0000010000000000000115 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Resources/Assets.xcassets"; sourceTree = "<group>"; };
+		1B0000010000000000000116 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Resources/Info.plist"; sourceTree = "<group>"; };
+		1B00000100000000000001FF /* Ascend.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Ascend.app; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		1B0000010000000000000201 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		1B0000010000000000000301 = {
+			isa = PBXGroup;
+			children = (
+				1B0000010000000000000302 /* Ascend */,
+				1B0000010000000000000303 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		1B0000010000000000000302 /* Ascend */ = {
+			isa = PBXGroup;
+			children = (
+				1B0000010000000000000101 /* AscendApp.swift */,
+				1B0000010000000000000102 /* AppState.swift */,
+				1B0000010000000000000103 /* MainTabView.swift */,
+				1B0000010000000000000104 /* UserProfile.swift */,
+				1B0000010000000000000105 /* WorkoutModels.swift */,
+				1B0000010000000000000106 /* NutritionModels.swift */,
+				1B0000010000000000000107 /* DisciplineModels.swift */,
+				1B0000010000000000000108 /* OnboardingCalculator.swift */,
+				1B0000010000000000000109 /* RoutineGenerator.swift */,
+				1B000001000000000000010A /* Theme.swift */,
+				1B000001000000000000010B /* GlassCard.swift */,
+				1B000001000000000000010C /* RestTimerView.swift */,
+				1B000001000000000000010D /* OnboardingFlowView.swift */,
+				1B000001000000000000010E /* DashboardView.swift */,
+				1B000001000000000000010F /* WorkoutListView.swift */,
+				1B0000010000000000000110 /* ActiveWorkoutPlayerView.swift */,
+				1B0000010000000000000111 /* ExerciseDetailView.swift */,
+				1B0000010000000000000112 /* DietAndPortionView.swift */,
+				1B0000010000000000000113 /* SupplementHubView.swift */,
+				1B0000010000000000000114 /* AnalyticsView.swift */,
+				1B0000010000000000000115 /* Assets.xcassets */,
+				1B0000010000000000000116 /* Info.plist */,
+			);
+			path = Ascend;
+			sourceTree = "<group>";
+		};
+		1B0000010000000000000303 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				1B00000100000000000001FF /* Ascend.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		1B0000010000000000000401 /* Ascend */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1B0000010000000000000501 /* Build configuration list for PBXNativeTarget "Ascend" */;
+			buildPhases = (
+				1B0000010000000000000601 /* Sources */,
+				1B0000010000000000000201 /* Frameworks */,
+				1B0000010000000000000602 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Ascend;
+			productName = Ascend;
+			productReference = 1B00000100000000000001FF /* Ascend.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		1B0000010000000000000701 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1600;
+				LastUpgradeCheck = 1600;
+				TargetAttributes = {
+					1B0000010000000000000401 = {
+						CreatedOnToolsVersion = 16.0;
+					};
+				};
+			};
+			buildConfigurationList = 1B0000010000000000000502 /* Build configuration list for PBXProject "Ascend" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 1B0000010000000000000301;
+			productRefGroup = 1B0000010000000000000303 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				1B0000010000000000000401 /* Ascend */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		1B0000010000000000000602 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1B0000010000000000000015 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		1B0000010000000000000601 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1B0000010000000000000001 /* AscendApp.swift in Sources */,
+				1B0000010000000000000002 /* AppState.swift in Sources */,
+				1B0000010000000000000003 /* MainTabView.swift in Sources */,
+				1B0000010000000000000004 /* UserProfile.swift in Sources */,
+				1B0000010000000000000005 /* WorkoutModels.swift in Sources */,
+				1B0000010000000000000006 /* NutritionModels.swift in Sources */,
+				1B0000010000000000000007 /* DisciplineModels.swift in Sources */,
+				1B0000010000000000000008 /* OnboardingCalculator.swift in Sources */,
+				1B0000010000000000000009 /* RoutineGenerator.swift in Sources */,
+				1B000001000000000000000A /* Theme.swift in Sources */,
+				1B000001000000000000000B /* GlassCard.swift in Sources */,
+				1B000001000000000000000C /* RestTimerView.swift in Sources */,
+				1B000001000000000000000D /* OnboardingFlowView.swift in Sources */,
+				1B000001000000000000000E /* DashboardView.swift in Sources */,
+				1B000001000000000000000F /* WorkoutListView.swift in Sources */,
+				1B0000010000000000000010 /* ActiveWorkoutPlayerView.swift in Sources */,
+				1B0000010000000000000011 /* ExerciseDetailView.swift in Sources */,
+				1B0000010000000000000012 /* DietAndPortionView.swift in Sources */,
+				1B0000010000000000000013 /* SupplementHubView.swift in Sources */,
+				1B0000010000000000000014 /* AnalyticsView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		1B0000010000000000000801 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		1B0000010000000000000802 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		1B0000010000000000000803 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Ascend/Resources/Info.plist;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.gauravthapa.Ascend;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		1B0000010000000000000804 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Ascend/Resources/Info.plist;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.gauravthapa.Ascend;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		1B0000010000000000000501 /* Build configuration list for PBXNativeTarget "Ascend" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1B0000010000000000000803 /* Debug */,
+				1B0000010000000000000804 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		1B0000010000000000000502 /* Build configuration list for PBXProject "Ascend" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1B0000010000000000000801 /* Debug */,
+				1B0000010000000000000802 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 1B0000010000000000000701 /* Project object */;
+}
