@@ -32,6 +32,8 @@ public struct DashboardView: View {
             .reduce(0) { $0 + $1.calories }
     }
     
+    @State private var showingEditProfileSheet = false
+    
     public init() {}
     
     public var body: some View {
@@ -65,10 +67,26 @@ public struct DashboardView: View {
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     if let profile = profile {
-                        Label(profile.goal.rawValue, systemImage: profile.goal.badge)
+                        Button {
+                            showingEditProfileSheet = true
+                        } label: {
+                            HStack(spacing: 5) {
+                                Image(systemName: "slider.horizontal.3")
+                                Text("Edit Profile")
+                            }
                             .font(.caption.bold())
-                            .foregroundStyle(AscendTheme.emerald)
+                            .foregroundStyle(AscendTheme.bgPrimary)
+                            .padding(.horizontal, 10)
+                            .padding(.vertical, 5)
+                            .background(AscendTheme.emerald)
+                            .clipShape(Capsule())
+                        }
                     }
+                }
+            }
+            .sheet(isPresented: $showingEditProfileSheet) {
+                if let profile = profile {
+                    OnboardingFlowView(profile: profile, isEditing: true)
                 }
             }
         }
