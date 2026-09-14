@@ -46,31 +46,33 @@ public struct DietAndPortionView: View {
     public var body: some View {
         NavigationStack {
             ZStack(alignment: .top) {
-                ScrollView(.vertical, showsIndicators: false) {
-                    VStack(spacing: 20) {
-                        // Macro Progress Ring & Numbers
-                        macroHeroCard
-                        
-                        // Smart Photo Scanner Action Banner
-                        smartScanBanner
-                        
-                        // Daily Recurring Staples (1-Tap Log)
-                        quickStaplesSection
-                        
-                        // Hand-Based Visual Portion Guide
-                        handPortionGuideSection
-                        
-                        // Food Suggestions & Staple Library
-                        foodSuggestionsSection
-                        
-                        // Today's Logged Meals
-                        todayLoggedMealsSection
+                GeometryReader { geo in
+                    ScrollView(.vertical, showsIndicators: false) {
+                        VStack(spacing: 20) {
+                            // Macro Progress Ring & Numbers
+                            macroHeroCard
+                            
+                            // Smart Photo Scanner Action Banner
+                            smartScanBanner
+                            
+                            // Daily Recurring Staples (1-Tap Log)
+                            quickStaplesSection
+                            
+                            // Hand-Based Visual Portion Guide
+                            handPortionGuideSection
+                            
+                            // Food Suggestions & Staple Library
+                            foodSuggestionsSection
+                            
+                            // Today's Logged Meals
+                            todayLoggedMealsSection
+                        }
+                        .padding(.horizontal, 20)
+                        .padding(.vertical, 16)
+                        .frame(width: geo.size.width)
                     }
-                    .frame(maxWidth: .infinity)
-                    .padding(.horizontal, 20)
-                    .padding(.vertical, 16)
+                    .scrollBounceBehavior(.basedOnSize, axes: .horizontal)
                 }
-                .scrollBounceBehavior(.basedOnSize, axes: .horizontal)
                 
                 // Toast notification on 1-tap quick log
                 if let toast = quickLogToastMessage {
@@ -156,7 +158,7 @@ public struct DietAndPortionView: View {
                 }
                 
                 // Big 4 Macro Meters
-                HStack(spacing: 12) {
+                HStack(spacing: 8) {
                     macroMeter(
                         title: "Calories",
                         current: Double(totalCaloriesToday),
@@ -201,19 +203,24 @@ public struct DietAndPortionView: View {
         color: Color
     ) -> some View {
         let progress = target > 0 ? min(1.0, current / target) : 0
-        return VStack(spacing: 6) {
+        return VStack(spacing: 4) {
             Text(title)
-                .font(.caption2)
+                .font(.system(size: 10, weight: .medium))
                 .foregroundStyle(AscendTheme.textSecondary)
+                .lineLimit(1)
             
             Text("\(Int(current))")
                 .font(.system(.subheadline, design: .rounded).bold())
                 .monospacedDigit()
                 .foregroundStyle(AscendTheme.textPrimary)
+                .lineLimit(1)
+                .minimumScaleFactor(0.8)
             
             Text("/ \(Int(target))\(unit)")
-                .font(.system(size: 9))
+                .font(.system(size: 8))
                 .foregroundStyle(AscendTheme.textMuted)
+                .lineLimit(1)
+                .minimumScaleFactor(0.75)
             
             // Mini progress bar
             ProgressView(value: progress, total: 1.0)
@@ -222,7 +229,7 @@ public struct DietAndPortionView: View {
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, 8)
-        .padding(.horizontal, 6)
+        .padding(.horizontal, 4)
         .background(AscendTheme.bgElevated)
         .clipShape(RoundedRectangle(cornerRadius: 12))
     }
@@ -354,6 +361,7 @@ public struct DietAndPortionView: View {
                                 Text(food.name)
                                     .font(.subheadline.bold())
                                     .foregroundStyle(AscendTheme.textPrimary)
+                                    .lineLimit(1)
                                 
                                 if food.isBudgetStaple {
                                     Text("BUDGET STAPLE")
@@ -386,6 +394,7 @@ public struct DietAndPortionView: View {
                                     .foregroundStyle(AscendTheme.textMuted)
                             }
                         }
+                        .frame(maxWidth: .infinity, alignment: .leading)
                         
                         Spacer()
                         
@@ -410,14 +419,14 @@ public struct DietAndPortionView: View {
         Button {
             showingSmartScanSheet = true
         } label: {
-            GlassCard(cornerRadius: 18, padding: 16) {
-                HStack(spacing: 16) {
+            GlassCard(cornerRadius: 18, padding: 14) {
+                HStack(spacing: 14) {
                     ZStack {
                         Circle()
                             .fill(AscendTheme.emerald.opacity(0.18))
-                            .frame(width: 48, height: 48)
+                            .frame(width: 44, height: 44)
                         Image(systemName: "camera.viewfinder")
-                            .font(.title2.bold())
+                            .font(.title3.bold())
                             .foregroundStyle(AscendTheme.emerald)
                     }
                     
@@ -428,7 +437,7 @@ public struct DietAndPortionView: View {
                                 .foregroundStyle(AscendTheme.textPrimary)
                             
                             Text("AI VISION")
-                                .font(.system(size: 9, weight: .black))
+                                .font(.system(size: 8, weight: .black))
                                 .foregroundStyle(AscendTheme.bgPrimary)
                                 .padding(.horizontal, 6)
                                 .padding(.vertical, 2)
@@ -437,11 +446,12 @@ public struct DietAndPortionView: View {
                         }
                         
                         Text("Snap meal photo • Auto-compressed • Calorie & macro prediction")
-                            .font(.caption)
+                            .font(.caption2)
                             .foregroundStyle(AscendTheme.textSecondary)
+                            .lineLimit(2)
+                            .multilineTextAlignment(.leading)
                     }
-                    
-                    Spacer()
+                    .frame(maxWidth: .infinity, alignment: .leading)
                     
                     Image(systemName: "chevron.right")
                         .font(.caption.bold())
@@ -475,13 +485,14 @@ public struct DietAndPortionView: View {
             
             if savedStaples.isEmpty {
                 GlassCard(cornerRadius: 14, padding: 12) {
-                    HStack {
+                    HStack(spacing: 8) {
                         Image(systemName: "sparkles")
                             .foregroundStyle(AscendTheme.amber)
-                        Text("Save everyday staples (e.g. coffee, morning oats) for 1-tap fast logging!")
+                        Text("Save everyday staples for 1-tap fast logging!")
                             .font(.caption)
                             .foregroundStyle(AscendTheme.textSecondary)
-                        Spacer()
+                            .lineLimit(2)
+                            .frame(maxWidth: .infinity, alignment: .leading)
                         Button("Add") {
                             showingManageStaplesSheet = true
                         }
@@ -627,7 +638,7 @@ public struct DietAndPortionView: View {
                             }
                             
                             VStack(alignment: .leading, spacing: 2) {
-                                HStack {
+                                HStack(spacing: 4) {
                                     Text(meal.mealSlot)
                                         .font(.caption2.bold())
                                         .foregroundStyle(AscendTheme.emerald)
@@ -647,12 +658,14 @@ public struct DietAndPortionView: View {
                                     Text(meal.foodName)
                                         .font(.subheadline.bold())
                                         .foregroundStyle(AscendTheme.textPrimary)
+                                        .lineLimit(1)
                                 }
                                 
                                 Text("\(Int(meal.proteinGrams))g Protein • \(meal.calories) kcal")
                                     .font(.caption2)
                                     .foregroundStyle(AscendTheme.textSecondary)
                             }
+                            .frame(maxWidth: .infinity, alignment: .leading)
                             
                             Spacer()
                             
