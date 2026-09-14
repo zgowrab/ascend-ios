@@ -36,7 +36,7 @@ public struct AnalyticsView: View {
     
     public var body: some View {
         NavigationStack {
-            ScrollView {
+            ScrollView(.vertical, showsIndicators: false) {
                 VStack(spacing: 20) {
                     // Career Stats Row
                     careerStatsRow
@@ -50,9 +50,11 @@ public struct AnalyticsView: View {
                     // Milestones & Betterment Badges
                     milestonesSection
                 }
+                .frame(maxWidth: .infinity)
                 .padding(.horizontal, 20)
                 .padding(.vertical, 16)
             }
+            .scrollBounceBehavior(.basedOnSize, axes: .horizontal)
             .ascendBackground()
             .navigationTitle("Analytics & Progress")
             .navigationBarTitleDisplayMode(.inline)

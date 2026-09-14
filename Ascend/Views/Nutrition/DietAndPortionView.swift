@@ -46,7 +46,7 @@ public struct DietAndPortionView: View {
     public var body: some View {
         NavigationStack {
             ZStack(alignment: .top) {
-                ScrollView {
+                ScrollView(.vertical, showsIndicators: false) {
                     VStack(spacing: 20) {
                         // Macro Progress Ring & Numbers
                         macroHeroCard
@@ -66,9 +66,11 @@ public struct DietAndPortionView: View {
                         // Today's Logged Meals
                         todayLoggedMealsSection
                     }
+                    .frame(maxWidth: .infinity)
                     .padding(.horizontal, 20)
                     .padding(.vertical, 16)
                 }
+                .scrollBounceBehavior(.basedOnSize, axes: .horizontal)
                 
                 // Toast notification on 1-tap quick log
                 if let toast = quickLogToastMessage {
@@ -214,17 +216,9 @@ public struct DietAndPortionView: View {
                 .foregroundStyle(AscendTheme.textMuted)
             
             // Mini progress bar
-            GeometryReader { geo in
-                ZStack(alignment: .leading) {
-                    Capsule()
-                        .fill(Color.white.opacity(0.08))
-                        .frame(height: 4)
-                    Capsule()
-                        .fill(color)
-                        .frame(width: geo.size.width * CGFloat(progress), height: 4)
-                }
-            }
-            .frame(height: 4)
+            ProgressView(value: progress, total: 1.0)
+                .tint(color)
+                .frame(height: 4)
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, 8)
@@ -279,6 +273,7 @@ public struct DietAndPortionView: View {
                     )
                 }
             }
+            .scrollBounceBehavior(.basedOnSize, axes: .horizontal)
         }
     }
     
@@ -327,24 +322,27 @@ public struct DietAndPortionView: View {
                 .foregroundStyle(AscendTheme.cyan)
             
             // Category selector
-            HStack(spacing: 8) {
-                ForEach(FoodCategory.allCases) { cat in
-                    Button {
-                        selectedFoodCategory = cat
-                    } label: {
-                        HStack(spacing: 4) {
-                            Image(systemName: cat.icon)
-                            Text(cat.rawValue)
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 8) {
+                    ForEach(FoodCategory.allCases) { cat in
+                        Button {
+                            selectedFoodCategory = cat
+                        } label: {
+                            HStack(spacing: 4) {
+                                Image(systemName: cat.icon)
+                                Text(cat.rawValue)
+                            }
+                            .font(.caption.bold())
+                            .padding(.horizontal, 10)
+                            .padding(.vertical, 6)
+                            .background(selectedFoodCategory == cat ? AscendTheme.cyan : AscendTheme.bgElevated)
+                            .foregroundStyle(selectedFoodCategory == cat ? AscendTheme.bgPrimary : AscendTheme.textSecondary)
+                            .clipShape(Capsule())
                         }
-                        .font(.caption.bold())
-                        .padding(.horizontal, 10)
-                        .padding(.vertical, 6)
-                        .background(selectedFoodCategory == cat ? AscendTheme.cyan : AscendTheme.bgElevated)
-                        .foregroundStyle(selectedFoodCategory == cat ? AscendTheme.bgPrimary : AscendTheme.textSecondary)
-                        .clipShape(Capsule())
                     }
                 }
             }
+            .scrollBounceBehavior(.basedOnSize, axes: .horizontal)
             
             // Food items in category
             let filteredFoods = foodItems.filter { $0.category == selectedFoodCategory }
@@ -500,6 +498,7 @@ public struct DietAndPortionView: View {
                     }
                     .padding(.vertical, 2)
                 }
+                .scrollBounceBehavior(.basedOnSize, axes: .horizontal)
             }
         }
     }

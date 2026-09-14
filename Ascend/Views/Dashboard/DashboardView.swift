@@ -41,7 +41,7 @@ public struct DashboardView: View {
     
     public var body: some View {
         NavigationStack {
-            ScrollView {
+            ScrollView(.vertical, showsIndicators: false) {
                 VStack(spacing: 20) {
                     // Header with Discipline Score Ring
                     headerScoreSection
@@ -61,9 +61,11 @@ public struct DashboardView: View {
                     // Today's Supplement Protocol
                     supplementProtocolSection
                 }
+                .frame(maxWidth: .infinity)
                 .padding(.horizontal, 20)
                 .padding(.vertical, 16)
             }
+            .scrollBounceBehavior(.basedOnSize, axes: .horizontal)
             .ascendBackground()
             .navigationTitle("Ascend")
             .navigationBarTitleDisplayMode(.inline)
@@ -359,6 +361,7 @@ public struct DashboardView: View {
                                 }
                             }
                         }
+                        .scrollBounceBehavior(.basedOnSize, axes: .horizontal)
                         
                         Button {
                             appState.startWorkout(routine: primaryRoutine, day: firstDay)
@@ -511,6 +514,7 @@ public struct DashboardView: View {
                                     }
                                 }
                             }
+                            .scrollBounceBehavior(.basedOnSize, axes: .horizontal)
                         }
                     }
                 }

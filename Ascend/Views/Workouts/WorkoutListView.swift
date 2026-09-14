@@ -95,7 +95,7 @@ public struct WorkoutListView: View {
     
     // MARK: - Routine Cycle View
     private var routineCycleView: some View {
-        ScrollView {
+        ScrollView(.vertical, showsIndicators: false) {
             VStack(spacing: 20) {
                 if let routine = routines.first {
                     // Routine Info Card
@@ -145,9 +145,11 @@ public struct WorkoutListView: View {
                     )
                 }
             }
+            .frame(maxWidth: .infinity)
             .padding(.horizontal, 20)
             .padding(.vertical, 14)
         }
+        .scrollBounceBehavior(.basedOnSize, axes: .horizontal)
     }
     
     private func dayCard(for day: RoutineDay, in routine: Routine) -> some View {
@@ -269,9 +271,10 @@ public struct WorkoutListView: View {
                 }
                 .padding(.horizontal, 20)
             }
+            .scrollBounceBehavior(.basedOnSize, axes: .horizontal)
             
             // Exercise Cards List
-            ScrollView {
+            ScrollView(.vertical, showsIndicators: false) {
                 LazyVStack(spacing: 10) {
                     ForEach(filteredExercises) { ex in
                         Button {
@@ -317,6 +320,7 @@ public struct WorkoutListView: View {
                 .padding(.horizontal, 20)
                 .padding(.vertical, 10)
             }
+            .scrollBounceBehavior(.basedOnSize, axes: .horizontal)
         }
     }
 }

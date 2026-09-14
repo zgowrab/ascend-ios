@@ -16,7 +16,7 @@ public struct SupplementHubView: View {
     
     public var body: some View {
         NavigationStack {
-            ScrollView {
+            ScrollView(.vertical, showsIndicators: false) {
                 VStack(spacing: 20) {
                     // Header Guidance Card
                     GlassCard(cornerRadius: 20, padding: 18) {
@@ -87,9 +87,11 @@ public struct SupplementHubView: View {
                         }
                     }
                 }
+                .frame(maxWidth: .infinity)
                 .padding(.horizontal, 20)
                 .padding(.vertical, 16)
             }
+            .scrollBounceBehavior(.basedOnSize, axes: .horizontal)
             .ascendBackground()
             .navigationTitle("Supplements")
             .navigationBarTitleDisplayMode(.inline)
