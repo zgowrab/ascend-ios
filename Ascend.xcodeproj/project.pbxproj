@@ -28,6 +28,10 @@
 		1B0000010000000000000013 /* Views/Nutrition/SupplementHubView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B0000010000000000000113 /* Views/Nutrition/SupplementHubView.swift */; };
 		1B0000010000000000000014 /* Views/Analytics/AnalyticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B0000010000000000000114 /* Views/Analytics/AnalyticsView.swift */; };
 		1B0000010000000000000015 /* Resources/Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1B0000010000000000000115 /* Resources/Assets.xcassets */; };
+		1B0000010000000000000016 /* Services/MealImageStorageService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B0000010000000000000117 /* Services/MealImageStorageService.swift */; };
+		1B0000010000000000000017 /* Services/SmartMealScannerService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B0000010000000000000118 /* Services/SmartMealScannerService.swift */; };
+		1B0000010000000000000018 /* Views/Nutrition/SmartMealScannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B0000010000000000000119 /* Views/Nutrition/SmartMealScannerView.swift */; };
+		1B0000010000000000000019 /* Views/Nutrition/QuickStaplesManagerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B000001000000000000011A /* Views/Nutrition/QuickStaplesManagerView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -53,6 +57,10 @@
 		1B0000010000000000000114 /* Views/Analytics/AnalyticsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Analytics/AnalyticsView.swift; sourceTree = "<group>"; };
 		1B0000010000000000000115 /* Resources/Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Resources/Assets.xcassets; sourceTree = "<group>"; };
 		1B0000010000000000000116 /* Resources/Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Resources/Info.plist; sourceTree = "<group>"; };
+		1B0000010000000000000117 /* Services/MealImageStorageService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/MealImageStorageService.swift; sourceTree = "<group>"; };
+		1B0000010000000000000118 /* Services/SmartMealScannerService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/SmartMealScannerService.swift; sourceTree = "<group>"; };
+		1B0000010000000000000119 /* Views/Nutrition/SmartMealScannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Nutrition/SmartMealScannerView.swift; sourceTree = "<group>"; };
+		1B000001000000000000011A /* Views/Nutrition/QuickStaplesManagerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Nutrition/QuickStaplesManagerView.swift; sourceTree = "<group>"; };
 		1B00000100000000000001FF /* Ascend.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Ascend.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -100,6 +108,10 @@
 				1B0000010000000000000114 /* Views/Analytics/AnalyticsView.swift */,
 				1B0000010000000000000115 /* Resources/Assets.xcassets */,
 				1B0000010000000000000116 /* Resources/Info.plist */,
+				1B0000010000000000000117 /* Services/MealImageStorageService.swift */,
+				1B0000010000000000000118 /* Services/SmartMealScannerService.swift */,
+				1B0000010000000000000119 /* Views/Nutrition/SmartMealScannerView.swift */,
+				1B000001000000000000011A /* Views/Nutrition/QuickStaplesManagerView.swift */,
 			);
 			path = Ascend;
 			sourceTree = "<group>";
@@ -201,6 +213,10 @@
 				1B0000010000000000000012 /* Views/Nutrition/DietAndPortionView.swift in Sources */,
 				1B0000010000000000000013 /* Views/Nutrition/SupplementHubView.swift in Sources */,
 				1B0000010000000000000014 /* Views/Analytics/AnalyticsView.swift in Sources */,
+				1B0000010000000000000016 /* Services/MealImageStorageService.swift in Sources */,
+				1B0000010000000000000017 /* Services/SmartMealScannerService.swift in Sources */,
+				1B0000010000000000000018 /* Views/Nutrition/SmartMealScannerView.swift in Sources */,
+				1B0000010000000000000019 /* Views/Nutrition/QuickStaplesManagerView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

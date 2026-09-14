@@ -37,5 +37,9 @@
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
 	</array>
+	<key>NSCameraUsageDescription</key>
+	<string>Ascend uses your camera to quickly scan meals, compress images for efficient storage, and predict calories and macros.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Ascend accesses your photos to analyze and log meals from your photo library.</string>
 </dict>
 </plist>

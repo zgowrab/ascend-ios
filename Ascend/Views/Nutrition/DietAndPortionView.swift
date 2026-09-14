@@ -7,12 +7,16 @@ public struct DietAndPortionView: View {
     @Query private var profiles: [UserProfile]
     @Query(sort: \FoodItem.name) private var foodItems: [FoodItem]
     @Query(sort: \DailyMealLog.date, order: .reverse) private var mealLogs: [DailyMealLog]
+    @Query(sort: \SavedFavoriteMeal.useCount, order: .reverse) private var savedStaples: [SavedFavoriteMeal]
     
     @State private var selectedFoodCategory: FoodCategory = .protein
     @State private var showingAddMealSheet = false
+    @State private var showingSmartScanSheet = false
+    @State private var showingManageStaplesSheet = false
     @State private var selectedFoodToLog: FoodItem?
     @State private var logMealSlot: String = "Lunch"
     @State private var logServings: Double = 1.0
+    @State private var quickLogToastMessage: String?
     
     private var profile: UserProfile? { profiles.first }
     
@@ -41,28 +45,83 @@ public struct DietAndPortionView: View {
     
     public var body: some View {
         NavigationStack {
-            ScrollView {
-                VStack(spacing: 20) {
-                    // Macro Progress Ring & Numbers
-                    macroHeroCard
-                    
-                    // Hand-Based Visual Portion Guide
-                    handPortionGuideSection
-                    
-                    // Food Suggestions & Staple Library
-                    foodSuggestionsSection
-                    
-                    // Today's Logged Meals
-                    todayLoggedMealsSection
+            ZStack(alignment: .top) {
+                ScrollView {
+                    VStack(spacing: 20) {
+                        // Macro Progress Ring & Numbers
+                        macroHeroCard
+                        
+                        // Smart Photo Scanner Action Banner
+                        smartScanBanner
+                        
+                        // Daily Recurring Staples (1-Tap Log)
+                        quickStaplesSection
+                        
+                        // Hand-Based Visual Portion Guide
+                        handPortionGuideSection
+                        
+                        // Food Suggestions & Staple Library
+                        foodSuggestionsSection
+                        
+                        // Today's Logged Meals
+                        todayLoggedMealsSection
+                    }
+                    .padding(.horizontal, 20)
+                    .padding(.vertical, 16)
                 }
-                .padding(.horizontal, 20)
-                .padding(.vertical, 16)
+                
+                // Toast notification on 1-tap quick log
+                if let toast = quickLogToastMessage {
+                    HStack(spacing: 8) {
+                        Image(systemName: "checkmark.circle.fill")
+                            .foregroundStyle(AscendTheme.emerald)
+                        Text(toast)
+                            .font(.caption.bold())
+                            .foregroundStyle(AscendTheme.textPrimary)
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 10)
+                    .background(.ultraThinMaterial)
+                    .clipShape(Capsule())
+                    .overlay(
+                        Capsule()
+                            .stroke(AscendTheme.cardBorder, lineWidth: 1)
+                    )
+                    .shadow(color: .black.opacity(0.3), radius: 10, y: 4)
+                    .padding(.top, 10)
+                    .transition(.move(edge: .top).combined(with: .opacity))
+                    .zIndex(100)
+                }
             }
             .ascendBackground()
             .navigationTitle("Nutrition & Portions")
             .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
+                        showingSmartScanSheet = true
+                    } label: {
+                        HStack(spacing: 4) {
+                            Image(systemName: "camera.viewfinder")
+                            Text("Scan")
+                        }
+                        .font(.caption.bold())
+                        .foregroundStyle(AscendTheme.bgPrimary)
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 5)
+                        .background(AscendTheme.emerald)
+                        .clipShape(Capsule())
+                    }
+                }
+            }
             .sheet(item: $selectedFoodToLog) { food in
                 logFoodSheet(for: food)
+            }
+            .sheet(isPresented: $showingSmartScanSheet) {
+                SmartMealScannerView()
+            }
+            .sheet(isPresented: $showingManageStaplesSheet) {
+                QuickStaplesManagerView()
             }
         }
     }
@@ -348,6 +407,182 @@ public struct DietAndPortionView: View {
         }
     }
     
+    // MARK: - Smart Photo Scan Banner
+    private var smartScanBanner: some View {
+        Button {
+            showingSmartScanSheet = true
+        } label: {
+            GlassCard(cornerRadius: 18, padding: 16) {
+                HStack(spacing: 16) {
+                    ZStack {
+                        Circle()
+                            .fill(AscendTheme.emerald.opacity(0.18))
+                            .frame(width: 48, height: 48)
+                        Image(systemName: "camera.viewfinder")
+                            .font(.title2.bold())
+                            .foregroundStyle(AscendTheme.emerald)
+                    }
+                    
+                    VStack(alignment: .leading, spacing: 3) {
+                        HStack(spacing: 6) {
+                            Text("Smart Photo Scan")
+                                .font(.headline.bold())
+                                .foregroundStyle(AscendTheme.textPrimary)
+                            
+                            Text("AI VISION")
+                                .font(.system(size: 9, weight: .black))
+                                .foregroundStyle(AscendTheme.bgPrimary)
+                                .padding(.horizontal, 6)
+                                .padding(.vertical, 2)
+                                .background(AscendTheme.emerald)
+                                .clipShape(Capsule())
+                        }
+                        
+                        Text("Snap meal photo • Auto-compressed • Calorie & macro prediction")
+                            .font(.caption)
+                            .foregroundStyle(AscendTheme.textSecondary)
+                    }
+                    
+                    Spacer()
+                    
+                    Image(systemName: "chevron.right")
+                        .font(.caption.bold())
+                        .foregroundStyle(AscendTheme.textMuted)
+                }
+            }
+        }
+    }
+    
+    // MARK: - Daily Recurring Staples (1-Tap Log)
+    private var quickStaplesSection: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack {
+                Label("Daily Recurring Staples", systemImage: "star.fill")
+                    .font(.headline)
+                    .foregroundStyle(AscendTheme.amber)
+                
+                Spacer()
+                
+                Button {
+                    showingManageStaplesSheet = true
+                } label: {
+                    HStack(spacing: 4) {
+                        Image(systemName: "slider.horizontal.3")
+                        Text("Manage")
+                    }
+                    .font(.caption.bold())
+                    .foregroundStyle(AscendTheme.cyan)
+                }
+            }
+            
+            if savedStaples.isEmpty {
+                GlassCard(cornerRadius: 14, padding: 12) {
+                    HStack {
+                        Image(systemName: "sparkles")
+                            .foregroundStyle(AscendTheme.amber)
+                        Text("Save everyday staples (e.g. coffee, morning oats) for 1-tap fast logging!")
+                            .font(.caption)
+                            .foregroundStyle(AscendTheme.textSecondary)
+                        Spacer()
+                        Button("Add") {
+                            showingManageStaplesSheet = true
+                        }
+                        .font(.caption.bold())
+                        .foregroundStyle(AscendTheme.emerald)
+                    }
+                }
+            } else {
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 12) {
+                        ForEach(savedStaples) { staple in
+                            stapleQuickCard(staple)
+                        }
+                    }
+                    .padding(.vertical, 2)
+                }
+            }
+        }
+    }
+    
+    private func stapleQuickCard(_ staple: SavedFavoriteMeal) -> some View {
+        Button {
+            logStapleImmediately(staple)
+        } label: {
+            HStack(spacing: 12) {
+                Image(systemName: staple.icon)
+                    .font(.title3)
+                    .foregroundStyle(AscendTheme.emerald)
+                    .frame(width: 38, height: 38)
+                    .background(AscendTheme.bgSecondary)
+                    .clipShape(Circle())
+                
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(staple.name)
+                        .font(.subheadline.bold())
+                        .foregroundStyle(AscendTheme.textPrimary)
+                        .lineLimit(1)
+                    
+                    HStack(spacing: 6) {
+                        Text("\(staple.calories) kcal")
+                            .font(.caption2.bold())
+                            .foregroundStyle(AscendTheme.emerald)
+                        
+                        Text("•")
+                            .font(.caption2)
+                            .foregroundStyle(AscendTheme.textMuted)
+                        
+                        Text("\(Int(staple.proteinGrams))g P")
+                            .font(.caption2)
+                            .foregroundStyle(AscendTheme.cyan)
+                    }
+                }
+                
+                Image(systemName: "plus.circle.fill")
+                    .font(.title3)
+                    .foregroundStyle(AscendTheme.emerald)
+            }
+            .padding(.horizontal, 14)
+            .padding(.vertical, 10)
+            .background(AscendTheme.bgElevated)
+            .clipShape(RoundedRectangle(cornerRadius: 14))
+            .overlay(
+                RoundedRectangle(cornerRadius: 14)
+                    .stroke(AscendTheme.cardBorder, lineWidth: 1)
+            )
+        }
+    }
+    
+    private func logStapleImmediately(_ staple: SavedFavoriteMeal) {
+        let log = DailyMealLog(
+            mealSlot: staple.mealSlot,
+            foodName: staple.name,
+            servings: 1.0,
+            proteinGrams: staple.proteinGrams,
+            carbsGrams: staple.carbsGrams,
+            fatsGrams: staple.fatsGrams,
+            calories: staple.calories,
+            isSmartScanned: false,
+            portionNotes: staple.servingDescription
+        )
+        modelContext.insert(log)
+        staple.useCount += 1
+        staple.lastLoggedAt = Date()
+        try? modelContext.save()
+        
+        // Haptic feedback & feedback toast
+        UINotificationFeedbackGenerator().notificationOccurred(.success)
+        withAnimation(.snappy) {
+            quickLogToastMessage = "Logged \(staple.name) (+\(staple.calories) kcal)"
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
+            withAnimation {
+                if quickLogToastMessage == "Logged \(staple.name) (+\(staple.calories) kcal)" {
+                    quickLogToastMessage = nil
+                }
+            }
+        }
+    }
+    
     // MARK: - Today's Logged Meals
     private var todayLoggedMealsSection: some View {
         VStack(alignment: .leading, spacing: 10) {
@@ -364,19 +599,50 @@ public struct DietAndPortionView: View {
             }
             
             if todayMealLogs.isEmpty {
-                Text("No meals logged yet today. Tap + on any food above to log your portions.")
+                Text("No meals logged yet today. Tap + on any food above, scan a meal photo, or tap a staple to log in 1 tap.")
                     .font(.caption)
                     .foregroundStyle(AscendTheme.textMuted)
                     .padding(.vertical, 8)
             } else {
                 VStack(spacing: 8) {
                     ForEach(todayMealLogs) { meal in
-                        HStack {
+                        HStack(spacing: 12) {
+                            if let photoName = meal.photoFileName,
+                               let photo = MealImageStorageService.shared.loadMealPhoto(fileName: photoName) {
+                                Image(uiImage: photo)
+                                    .resizable()
+                                    .scaledToFill()
+                                    .frame(width: 44, height: 44)
+                                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: 8)
+                                            .stroke(AscendTheme.cardBorder, lineWidth: 1)
+                                    )
+                            } else {
+                                Image(systemName: meal.isSmartScanned ? "camera.fill" : "fork.knife")
+                                    .font(.caption)
+                                    .foregroundStyle(meal.isSmartScanned ? AscendTheme.cyan : AscendTheme.emerald)
+                                    .frame(width: 40, height: 40)
+                                    .background(AscendTheme.bgSecondary)
+                                    .clipShape(Circle())
+                            }
+                            
                             VStack(alignment: .leading, spacing: 2) {
                                 HStack {
                                     Text(meal.mealSlot)
                                         .font(.caption2.bold())
                                         .foregroundStyle(AscendTheme.emerald)
+                                    
+                                    if meal.isSmartScanned {
+                                        Text("AI SCAN")
+                                            .font(.system(size: 8, weight: .black))
+                                            .foregroundStyle(AscendTheme.cyan)
+                                            .padding(.horizontal, 4)
+                                            .padding(.vertical, 1)
+                                            .background(AscendTheme.cyan.opacity(0.15))
+                                            .clipShape(Capsule())
+                                    }
+                                    
                                     Text("•")
                                         .foregroundStyle(AscendTheme.textMuted)
                                     Text(meal.foodName)
@@ -392,6 +658,9 @@ public struct DietAndPortionView: View {
                             Spacer()
                             
                             Button {
+                                if let photoName = meal.photoFileName {
+                                    MealImageStorageService.shared.deleteMealPhoto(fileName: photoName)
+                                }
                                 modelContext.delete(meal)
                                 try? modelContext.save()
                             } label: {
@@ -408,6 +677,7 @@ public struct DietAndPortionView: View {
             }
         }
     }
+
     
     // MARK: - Log Sheet
     private func logFoodSheet(for food: FoodItem) -> some View {
