@@ -32,6 +32,9 @@
 		1B0000010000000000000017 /* Services/SmartMealScannerService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B0000010000000000000118 /* Services/SmartMealScannerService.swift */; };
 		1B0000010000000000000018 /* Views/Nutrition/SmartMealScannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B0000010000000000000119 /* Views/Nutrition/SmartMealScannerView.swift */; };
 		1B0000010000000000000019 /* Views/Nutrition/QuickStaplesManagerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B000001000000000000011A /* Views/Nutrition/QuickStaplesManagerView.swift */; };
+		1B000001000000000000001A /* Services/WorkoutAudioCoachService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B000001000000000000011B /* Services/WorkoutAudioCoachService.swift */; };
+		1B000001000000000000001B /* Views/Workouts/Components/ExerciseKinematicAnimationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B000001000000000000011C /* Views/Workouts/Components/ExerciseKinematicAnimationView.swift */; };
+		1B000001000000000000001C /* Views/Workouts/Components/TargetMuscleMapVisualizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B000001000000000000011D /* Views/Workouts/Components/TargetMuscleMapVisualizer.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -61,6 +64,9 @@
 		1B0000010000000000000118 /* Services/SmartMealScannerService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/SmartMealScannerService.swift; sourceTree = "<group>"; };
 		1B0000010000000000000119 /* Views/Nutrition/SmartMealScannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Nutrition/SmartMealScannerView.swift; sourceTree = "<group>"; };
 		1B000001000000000000011A /* Views/Nutrition/QuickStaplesManagerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Nutrition/QuickStaplesManagerView.swift; sourceTree = "<group>"; };
+		1B000001000000000000011B /* Services/WorkoutAudioCoachService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/WorkoutAudioCoachService.swift; sourceTree = "<group>"; };
+		1B000001000000000000011C /* Views/Workouts/Components/ExerciseKinematicAnimationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workouts/Components/ExerciseKinematicAnimationView.swift; sourceTree = "<group>"; };
+		1B000001000000000000011D /* Views/Workouts/Components/TargetMuscleMapVisualizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workouts/Components/TargetMuscleMapVisualizer.swift; sourceTree = "<group>"; };
 		1B00000100000000000001FF /* Ascend.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Ascend.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -112,6 +118,9 @@
 				1B0000010000000000000118 /* Services/SmartMealScannerService.swift */,
 				1B0000010000000000000119 /* Views/Nutrition/SmartMealScannerView.swift */,
 				1B000001000000000000011A /* Views/Nutrition/QuickStaplesManagerView.swift */,
+				1B000001000000000000011B /* Services/WorkoutAudioCoachService.swift */,
+				1B000001000000000000011C /* Views/Workouts/Components/ExerciseKinematicAnimationView.swift */,
+				1B000001000000000000011D /* Views/Workouts/Components/TargetMuscleMapVisualizer.swift */,
 			);
 			path = Ascend;
 			sourceTree = "<group>";
@@ -217,6 +226,9 @@
 				1B0000010000000000000017 /* Services/SmartMealScannerService.swift in Sources */,
 				1B0000010000000000000018 /* Views/Nutrition/SmartMealScannerView.swift in Sources */,
 				1B0000010000000000000019 /* Views/Nutrition/QuickStaplesManagerView.swift in Sources */,
+				1B000001000000000000001A /* Services/WorkoutAudioCoachService.swift in Sources */,
+				1B000001000000000000001B /* Views/Workouts/Components/ExerciseKinematicAnimationView.swift in Sources */,
+				1B000001000000000000001C /* Views/Workouts/Components/TargetMuscleMapVisualizer.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
