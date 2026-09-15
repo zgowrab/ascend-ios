@@ -31,9 +31,27 @@ struct AscendApp: App {
         }
     }()
     
+    @State private var isAppReady: Bool = false
+    
     var body: some Scene {
         WindowGroup {
-            MainTabView()
+            ZStack {
+                MainTabView()
+                
+                if !isAppReady {
+                    AppLaunchLoadingView()
+                        .transition(.opacity)
+                        .zIndex(100)
+                }
+            }
+            .task {
+                // Brief pause allowing SwiftData initialization and brand crest presentation
+                try? await Task.sleep(nanoseconds: 1_250_000_000)
+                withAnimation(.easeInOut(duration: 0.45)) {
+                    isAppReady = true
+                }
+            }
+            .preferredColorScheme(.dark)
         }
         .modelContainer(sharedModelContainer)
     }
