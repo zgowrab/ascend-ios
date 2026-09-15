@@ -13,40 +13,53 @@ public final class WorkoutAudioCoachService: NSObject, AVSpeechSynthesizerDelega
     
     private let synthesizer = AVSpeechSynthesizer()
     private var waveTimer: Timer?
+    private var isSessionConfigured: Bool = false
     
     override private init() {
         super.init()
         synthesizer.delegate = self
-        configureAudioSession()
     }
     
-    private func configureAudioSession() {
+    private func ensureAudioSessionConfigured() {
+        guard !isSessionConfigured else { return }
+        isSessionConfigured = true
+        
+        #if !targetEnvironment(simulator)
         do {
             try AVAudioSession.sharedInstance().setCategory(
                 .playback,
                 mode: .spokenAudio,
-                options: [.duckOthers, .interruptSpokenAudioAndMixWithOthers]
+                options: [.duckOthers]
             )
         } catch {
-            print("WorkoutAudioCoachService: Failed to configure AVAudioSession: \(error.localizedDescription)")
+            print("WorkoutAudioCoachService: AVAudioSession error: \(error.localizedDescription)")
         }
+        #else
+        // In iOS Simulator, avoid IPCAUClient IPC connection failures to Mac host audio
+        try? AVAudioSession.sharedInstance().setCategory(.ambient, mode: .default)
+        #endif
     }
     
     public func speak(text: String, rate: Float = 0.48, pitch: Float = 1.0) {
         guard !isMuted else { return }
+        let cleanText = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !cleanText.isEmpty else { return }
         
-        // Activate audio session for ducking background music
+        ensureAudioSessionConfigured()
+        
+        #if !targetEnvironment(simulator)
         try? AVAudioSession.sharedInstance().setActive(true, options: [])
+        #endif
         
         if synthesizer.isSpeaking {
             synthesizer.stopSpeaking(at: .immediate)
         }
         
-        currentSpokenText = text
+        currentSpokenText = cleanText
         isSpeaking = true
         startWaveAnimation()
         
-        let utterance = AVSpeechUtterance(string: text)
+        let utterance = AVSpeechUtterance(string: cleanText)
         utterance.rate = rate
         utterance.pitchMultiplier = pitch
         utterance.preUtteranceDelay = 0.05
@@ -90,7 +103,10 @@ public final class WorkoutAudioCoachService: NSObject, AVSpeechSynthesizerDelega
         isSpeaking = false
         currentSpokenText = ""
         stopWaveAnimation()
+        
+        #if !targetEnvironment(simulator)
         try? AVAudioSession.sharedInstance().setActive(false, options: [.notifyOthersOnDeactivation])
+        #endif
     }
     
     public func toggleMute() {
@@ -112,7 +128,9 @@ public final class WorkoutAudioCoachService: NSObject, AVSpeechSynthesizerDelega
             self.isSpeaking = false
             self.currentSpokenText = ""
             self.stopWaveAnimation()
+            #if !targetEnvironment(simulator)
             try? AVAudioSession.sharedInstance().setActive(false, options: [.notifyOthersOnDeactivation])
+            #endif
         }
     }
     
@@ -121,7 +139,9 @@ public final class WorkoutAudioCoachService: NSObject, AVSpeechSynthesizerDelega
             self.isSpeaking = false
             self.currentSpokenText = ""
             self.stopWaveAnimation()
+            #if !targetEnvironment(simulator)
             try? AVAudioSession.sharedInstance().setActive(false, options: [.notifyOthersOnDeactivation])
+            #endif
         }
     }
     

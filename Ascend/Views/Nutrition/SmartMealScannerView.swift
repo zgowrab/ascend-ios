@@ -210,7 +210,7 @@ public struct SmartMealScannerView: View {
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 10) {
                         sampleDishButton(title: "Milk Coffee", icon: "cup.and.saucer.fill", query: "coffee mug latte")
-                        sampleDishButton(title: "Oatmeal Bowl", icon: "bowl.fill", query: "oatmeal bowl porridge berries")
+                        sampleDishButton(title: "Oatmeal Bowl", icon: "cup.and.heat.waves.fill", query: "oatmeal bowl porridge berries")
                         sampleDishButton(title: "Eggs & Toast", icon: "fork.knife", query: "egg scramble toast")
                         sampleDishButton(title: "Grilled Chicken", icon: "flame.fill", query: "chicken rice vegetables")
                         sampleDishButton(title: "Salmon Plate", icon: "leaf.fill", query: "salmon fish rice")
@@ -701,7 +701,7 @@ public struct SmartMealScannerView: View {
         if lower.contains("coffee") || lower.contains("latte") || lower.contains("tea") {
             return "cup.and.saucer.fill"
         } else if lower.contains("oat") || lower.contains("bowl") || lower.contains("cereal") {
-            return "bowl.fill"
+            return "cup.and.heat.waves.fill"
         } else if lower.contains("shake") || lower.contains("smoothie") {
             return "takeoutbag.and.cup.and.straw.fill"
         } else if lower.contains("egg") || lower.contains("toast") {

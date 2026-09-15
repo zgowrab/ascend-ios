@@ -21,7 +21,7 @@ public struct QuickStaplesManagerView: View {
     
     let availableIcons = [
         "cup.and.saucer.fill",
-        "bowl.fill",
+        "cup.and.heat.waves.fill",
         "fork.knife",
         "flame.fill",
         "takeoutbag.and.cup.and.straw.fill",
