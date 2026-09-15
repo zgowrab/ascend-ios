@@ -59,16 +59,15 @@ public enum MovementPattern: String, CaseIterable {
 public struct ExerciseKinematicAnimationView: View {
     let exerciseName: String
     let muscleGroup: MuscleGroup
-    var height: CGFloat = 220
+    var height: CGFloat = 240
     
     @State private var isPlaying: Bool = true
-    @State private var animationTime: Double = 0.0
     
     private var pattern: MovementPattern {
         MovementPattern.detect(for: exerciseName, muscleGroup: muscleGroup)
     }
     
-    public init(exerciseName: String, muscleGroup: MuscleGroup, height: CGFloat = 220) {
+    public init(exerciseName: String, muscleGroup: MuscleGroup, height: CGFloat = 240) {
         self.exerciseName = exerciseName
         self.muscleGroup = muscleGroup
         self.height = height
@@ -77,21 +76,17 @@ public struct ExerciseKinematicAnimationView: View {
     public var body: some View {
         TimelineView(.animation(paused: !isPlaying)) { timeline in
             let date = timeline.date.timeIntervalSinceReferenceDate
-            // 4.0 second loop: 2.2s eccentric, 0.4s bottom pause, 1.4s concentric
             let cyclePeriod: Double = 4.0
             let phaseProgress = (date.truncatingRemainder(dividingBy: cyclePeriod)) / cyclePeriod
             
-            // Calculate movement factor from 0.0 (top/start) to 1.0 (bottom/deepest)
+            // Calculate movement depth factor: 0.0 (start/lockout) to 1.0 (deepest eccentric tension)
             let depthFactor: CGFloat = {
                 if phaseProgress < 0.55 {
-                    // Eccentric descent
                     let p = phaseProgress / 0.55
                     return CGFloat(sin(p * .pi / 2))
                 } else if phaseProgress < 0.65 {
-                    // Isometric bottom stretch
                     return 1.0
                 } else {
-                    // Concentric ascent / drive
                     let p = (phaseProgress - 0.65) / 0.35
                     return CGFloat(cos(p * .pi / 2))
                 }
@@ -99,11 +94,11 @@ public struct ExerciseKinematicAnimationView: View {
             
             let phaseText: String = {
                 if phaseProgress < 0.55 {
-                    return "ECCENTRIC • 3s DESCENT"
+                    return "ECCENTRIC • 3s LOWER"
                 } else if phaseProgress < 0.65 {
-                    return "STRETCH • 1s PAUSE"
+                    return "PEAK TENSION • PAUSE"
                 } else {
-                    return "CONCENTRIC • 1s DRIVE"
+                    return "CONCENTRIC • EXPLODE"
                 }
             }()
             
@@ -118,26 +113,33 @@ public struct ExerciseKinematicAnimationView: View {
             }()
             
             ZStack {
-                // Background dark blueprint stage
+                // Background dark gym stage
                 RoundedRectangle(cornerRadius: 18, style: .continuous)
-                    .fill(AscendTheme.bgSecondary)
+                    .fill(
+                        LinearGradient(
+                            colors: [AscendTheme.bgSecondary, AscendTheme.bgPrimary],
+                            startPoint: .top,
+                            endPoint: .bottom
+                        )
+                    )
                     .overlay(
                         RoundedRectangle(cornerRadius: 18, style: .continuous)
                             .stroke(AscendTheme.cardBorder, lineWidth: 1)
                     )
                 
-                // Subtle blueprint grid
-                GridBackground()
+                // Subtle architectural gym grid
+                GymStageGrid()
                     .opacity(0.12)
                     .clipShape(RoundedRectangle(cornerRadius: 18))
                 
-                // Animated Biomechanical Kinetic Canvas
+                // Realistic Sculpted Human Athletic Canvas
                 Canvas { context, size in
-                    drawKinematics(
+                    drawAthleticMovement(
                         context: context,
                         size: size,
                         pattern: pattern,
-                        depth: depthFactor
+                        depth: depthFactor,
+                        phaseProgress: phaseProgress
                     )
                 }
                 
@@ -175,7 +177,7 @@ public struct ExerciseKinematicAnimationView: View {
                     
                     Spacer()
                     
-                    // Bottom Movement Label & Tempo Meter
+                    // Bottom Movement Badge & Tempo Cadence Bar
                     HStack {
                         Text(pattern.rawValue)
                             .font(.caption2.bold())
@@ -185,7 +187,6 @@ public struct ExerciseKinematicAnimationView: View {
                         
                         Spacer()
                         
-                        // Tempo Bar Progress
                         HStack(spacing: 3) {
                             ForEach(0..<4) { index in
                                 let active = Int(phaseProgress * 4) >= index
@@ -203,500 +204,543 @@ public struct ExerciseKinematicAnimationView: View {
         }
     }
     
-    // MARK: - Procedural Kinematic Rendering
-    private func drawKinematics(
+    // MARK: - Athletic Movement Router
+    private func drawAthleticMovement(
         context: GraphicsContext,
         size: CGSize,
         pattern: MovementPattern,
-        depth: CGFloat
+        depth: CGFloat,
+        phaseProgress: Double
     ) {
         let midX = size.width / 2
         let midY = size.height / 2
         
         switch pattern {
         case .horizontalPress:
-            drawBenchPress(context: context, size: size, midX: midX, midY: midY, depth: depth)
+            drawHumanBenchPress(context: context, size: size, midX: midX, midY: midY, depth: depth)
         case .verticalPress:
-            drawOverheadPress(context: context, size: size, midX: midX, midY: midY, depth: depth)
+            drawHumanOverheadPress(context: context, size: size, midX: midX, midY: midY, depth: depth)
         case .squat:
-            drawSquat(context: context, size: size, midX: midX, midY: midY, depth: depth)
+            drawHumanSquat(context: context, size: size, midX: midX, midY: midY, depth: depth)
         case .hinge:
-            drawDeadlift(context: context, size: size, midX: midX, midY: midY, depth: depth)
+            drawHumanDeadlift(context: context, size: size, midX: midX, midY: midY, depth: depth)
         case .verticalPull:
-            drawPullUp(context: context, size: size, midX: midX, midY: midY, depth: depth)
+            drawHumanPullUp(context: context, size: size, midX: midX, midY: midY, depth: depth)
         case .horizontalPull:
-            drawBentOverRow(context: context, size: size, midX: midX, midY: midY, depth: depth)
+            drawHumanBentOverRow(context: context, size: size, midX: midX, midY: midY, depth: depth)
         case .curl:
-            drawBicepCurl(context: context, size: size, midX: midX, midY: midY, depth: depth)
+            drawHumanBicepCurl(context: context, size: size, midX: midX, midY: midY, depth: depth)
         case .tricepExtension:
-            drawTricepPushdown(context: context, size: size, midX: midX, midY: midY, depth: depth)
+            drawHumanTricepPushdown(context: context, size: size, midX: midX, midY: midY, depth: depth)
         case .coreFlexion:
-            drawCoreHangingLegRaise(context: context, size: size, midX: midX, midY: midY, depth: depth)
+            drawHumanCoreLegRaise(context: context, size: size, midX: midX, midY: midY, depth: depth)
         }
     }
     
-    // MARK: - 1. Bench Press
-    private func drawBenchPress(context: GraphicsContext, size: CGSize, midX: CGFloat, midY: CGFloat, depth: CGFloat) {
-        // Bench surface
-        var bench = Path()
-        bench.move(to: CGPoint(x: midX - 70, y: midY + 25))
-        bench.addLine(to: CGPoint(x: midX + 60, y: midY + 25))
-        context.stroke(bench, with: .color(AscendTheme.textMuted.opacity(0.6)), lineWidth: 6)
+    // MARK: - 1. Sculpted Human Bench Press
+    private func drawHumanBenchPress(context: GraphicsContext, size: CGSize, midX: CGFloat, midY: CGFloat, depth: CGFloat) {
+        // High-density padded bench with leatherette dual-tone & steel support
+        let benchY = midY + 28
+        let benchPad = CGRect(x: midX - 85, y: benchY, width: 155, height: 12)
+        context.fill(Path(roundedRect: benchPad, cornerRadius: 4), with: .color(Color(white: 0.18)))
+        context.stroke(Path(roundedRect: benchPad, cornerRadius: 4), with: .color(Color(white: 0.3)), lineWidth: 1.5)
         
-        // Bench legs
+        // Steel frame legs
         var legs = Path()
-        legs.move(to: CGPoint(x: midX - 50, y: midY + 25))
-        legs.addLine(to: CGPoint(x: midX - 50, y: midY + 65))
-        legs.move(to: CGPoint(x: midX + 40, y: midY + 25))
-        legs.addLine(to: CGPoint(x: midX + 40, y: midY + 65))
-        context.stroke(legs, with: .color(AscendTheme.textMuted.opacity(0.4)), lineWidth: 3)
+        legs.move(to: CGPoint(x: midX - 65, y: benchY + 12))
+        legs.addLine(to: CGPoint(x: midX - 65, y: benchY + 48))
+        legs.move(to: CGPoint(x: midX + 45, y: benchY + 12))
+        legs.addLine(to: CGPoint(x: midX + 45, y: benchY + 48))
+        context.stroke(legs, with: .color(Color(white: 0.35)), lineWidth: 4)
         
-        // Torso lying flat
-        let headPos = CGPoint(x: midX - 55, y: midY + 14)
-        let shoulderPos = CGPoint(x: midX - 25, y: midY + 16)
-        let hipPos = CGPoint(x: midX + 25, y: midY + 16)
+        // Barbell trajectory: top is midY - 48, bottom is midY + 10
+        let barY = (midY - 48) + (depth * 58)
+        let barX = midX - 8
         
-        // Head
-        context.fill(Path(ellipseIn: CGRect(x: headPos.x - 9, y: headPos.y - 9, width: 18, height: 18)), with: .color(AscendTheme.textPrimary))
+        // --- 1. FAR LEG (Background layer for 3D depth) ---
+        let farHip = CGPoint(x: midX + 22, y: benchY - 4)
+        let farKnee = CGPoint(x: midX + 48, y: benchY + 22)
+        let farFoot = CGPoint(x: midX + 48, y: benchY + 48)
+        drawMuscularLeg(context: context, hip: farHip, knee: farKnee, ankle: farFoot, isForeground: false)
         
-        // Torso
-        var torso = Path()
-        torso.move(to: headPos)
-        torso.addLine(to: shoulderPos)
-        torso.addLine(to: hipPos)
-        context.stroke(torso, with: .color(AscendTheme.textPrimary), lineWidth: 5)
+        // --- 2. ATHLETE TORSO & HEAD ---
+        let headPos = CGPoint(x: midX - 62, y: benchY - 10)
+        let shoulderPos = CGPoint(x: midX - 25, y: benchY - 6)
+        let hipPos = CGPoint(x: midX + 25, y: benchY - 6)
         
-        // Legs to floor
-        let kneePos = CGPoint(x: midX + 45, y: midY + 35)
-        let footPos = CGPoint(x: midX + 45, y: midY + 65)
-        var legPath = Path()
-        legPath.move(to: hipPos)
-        legPath.addLine(to: kneePos)
-        legPath.addLine(to: footPos)
-        context.stroke(legPath, with: .color(AscendTheme.textSecondary), lineWidth: 4)
+        // Head & Jawline
+        drawAthleticHead(context: context, center: headPos, angle: 0)
         
-        // Barbell position moving vertically
-        // top: midY - 45, bottom: midY + 6
-        let barY = (midY - 45) + (depth * 51)
-        let barX = midX - 10
+        // Muscular Torso with Pectoral Swell
+        let pecFlexRatio = 1.0 - depth // maximum flex at lockout
+        drawMuscularTorsoSide(
+            context: context,
+            shoulder: shoulderPos,
+            hip: hipPos,
+            pecSwell: pecFlexRatio,
+            isLyingDown: true
+        )
         
-        // Arms: Shoulder -> Elbow -> Hand (at bar)
-        let elbowY = (midY - 15) + (depth * 32)
-        let elbowX = (midX - 35) + (depth * 6)
+        // --- 3. FOREGROUND LEG ---
+        let nearHip = CGPoint(x: midX + 28, y: benchY - 2)
+        let nearKnee = CGPoint(x: midX + 54, y: benchY + 20)
+        let nearFoot = CGPoint(x: midX + 54, y: benchY + 48)
+        drawMuscularLeg(context: context, hip: nearHip, knee: nearKnee, ankle: nearFoot, isForeground: true)
+        
+        // --- 4. ARMS & MUSCULAR ARTICULATION ---
+        let elbowY = (midY - 14) + (depth * 34)
+        let elbowX = (midX - 32) + (depth * 6)
         let handPos = CGPoint(x: barX, y: barY)
         
-        var arm = Path()
-        arm.move(to: shoulderPos)
-        arm.addLine(to: CGPoint(x: elbowX, y: elbowY))
-        arm.addLine(to: handPos)
-        context.stroke(arm, with: .color(AscendTheme.emerald), lineWidth: 4)
+        drawMuscularArm(
+            context: context,
+            shoulder: shoulderPos,
+            elbow: CGPoint(x: elbowX, y: elbowY),
+            hand: handPos,
+            isFlexed: pecFlexRatio > 0.6,
+            isForeground: true
+        )
         
-        // Joint markers
-        context.fill(Path(ellipseIn: CGRect(x: elbowX - 4, y: elbowY - 4, width: 8, height: 8)), with: .color(AscendTheme.cyan))
-        
-        // Barbell
-        var bar = Path()
-        bar.move(to: CGPoint(x: barX - 45, y: barY))
-        bar.addLine(to: CGPoint(x: barX + 45, y: barY))
-        context.stroke(bar, with: .color(Color.white), lineWidth: 4)
-        
-        // Plates on sides
-        context.fill(Path(roundedRect: CGRect(x: barX - 48, y: barY - 14, width: 6, height: 28), cornerRadius: 2), with: .color(AscendTheme.cyan))
-        context.fill(Path(roundedRect: CGRect(x: barX + 42, y: barY - 14, width: 6, height: 28), cornerRadius: 2), with: .color(AscendTheme.cyan))
-        
-        // Vertical path line
-        var pathLine = Path()
-        pathLine.move(to: CGPoint(x: barX, y: midY - 45))
-        pathLine.addLine(to: CGPoint(x: barX, y: midY + 6))
-        context.stroke(pathLine, with: .color(AscendTheme.emerald.opacity(0.3)), style: StrokeStyle(lineWidth: 1.5, dash: [4, 4]))
+        // --- 5. OLYMPIC BARBELL & WEIGHT PLATES ---
+        drawOlympicBarbell(context: context, center: handPos, width: 95)
     }
     
-    // MARK: - 2. Overhead Press
-    private func drawOverheadPress(context: GraphicsContext, size: CGSize, midX: CGFloat, midY: CGFloat, depth: CGFloat) {
-        // Ground
-        var floor = Path()
-        floor.move(to: CGPoint(x: midX - 60, y: midY + 70))
-        floor.addLine(to: CGPoint(x: midX + 60, y: midY + 70))
-        context.stroke(floor, with: .color(AscendTheme.textMuted.opacity(0.4)), lineWidth: 2)
+    // MARK: - 2. Sculpted Human Overhead Press
+    private func drawHumanOverheadPress(context: GraphicsContext, size: CGSize, midX: CGFloat, midY: CGFloat, depth: CGFloat) {
+        let floorY = midY + 74
+        drawGymFloor(context: context, midX: midX, floorY: floorY)
         
-        // Standing body
-        let headPos = CGPoint(x: midX, y: midY - 25)
-        let shoulderPos = CGPoint(x: midX, y: midY - 10)
-        let hipPos = CGPoint(x: midX, y: midY + 25)
+        let hipPos = CGPoint(x: midX, y: midY + 20)
+        let shoulderPos = CGPoint(x: midX, y: midY - 18)
+        let headPos = CGPoint(x: midX, y: midY - 34)
         
-        context.fill(Path(ellipseIn: CGRect(x: headPos.x - 9, y: headPos.y - 9, width: 18, height: 18)), with: .color(AscendTheme.textPrimary))
+        // Legs (Far and Near)
+        drawMuscularLeg(context: context, hip: hipPos, knee: CGPoint(x: midX - 12, y: midY + 48), ankle: CGPoint(x: midX - 12, y: floorY), isForeground: false)
+        drawMuscularLeg(context: context, hip: hipPos, knee: CGPoint(x: midX + 12, y: midY + 48), ankle: CGPoint(x: midX + 12, y: floorY), isForeground: true)
         
-        var spine = Path()
-        spine.move(to: shoulderPos)
-        spine.addLine(to: hipPos)
-        context.stroke(spine, with: .color(AscendTheme.textPrimary), lineWidth: 5)
+        // Torso
+        drawMuscularTorsoFront(context: context, shoulder: shoulderPos, hip: hipPos, deltoidFlex: 1.0 - depth)
+        drawAthleticHead(context: context, center: headPos, angle: 0)
         
-        // Legs
-        var legs = Path()
-        legs.move(to: hipPos)
-        legs.addLine(to: CGPoint(x: midX - 16, y: midY + 70))
-        legs.move(to: hipPos)
-        legs.addLine(to: CGPoint(x: midX + 16, y: midY + 70))
-        context.stroke(legs, with: .color(AscendTheme.textSecondary), lineWidth: 4)
+        // Barbell overhead motion: depth 0 is lockout (midY - 68), depth 1 is at collarbone (midY - 14)
+        let barY = (midY - 68) + (depth * 54)
         
-        // Bar position: depth = 0 is overhead lockout (midY - 65), depth = 1 is at collarbone (midY - 10)
-        let barY = (midY - 65) + (depth * 55)
+        let elbowY = (midY - 36) + (depth * 38)
+        let elbowLeftX = midX - 22 - (depth * 8)
+        let elbowRightX = midX + 22 + (depth * 8)
         
         // Arms
-        let elbowY = (midY - 35) + (depth * 40)
-        let elbowXLeft = midX - 18 - (depth * 10)
-        let elbowXRight = midX + 18 + (depth * 10)
-        
-        var leftArm = Path()
-        leftArm.move(to: shoulderPos)
-        leftArm.addLine(to: CGPoint(x: elbowXLeft, y: elbowY))
-        leftArm.addLine(to: CGPoint(x: midX - 22, y: barY))
-        context.stroke(leftArm, with: .color(AscendTheme.emerald), lineWidth: 3.5)
-        
-        var rightArm = Path()
-        rightArm.move(to: shoulderPos)
-        rightArm.addLine(to: CGPoint(x: elbowXRight, y: elbowY))
-        rightArm.addLine(to: CGPoint(x: midX + 22, y: barY))
-        context.stroke(rightArm, with: .color(AscendTheme.emerald), lineWidth: 3.5)
+        drawMuscularArm(context: context, shoulder: CGPoint(x: midX - 16, y: shoulderPos.y), elbow: CGPoint(x: elbowLeftX, y: elbowY), hand: CGPoint(x: midX - 22, y: barY), isFlexed: depth < 0.4, isForeground: true)
+        drawMuscularArm(context: context, shoulder: CGPoint(x: midX + 16, y: shoulderPos.y), elbow: CGPoint(x: elbowRightX, y: elbowY), hand: CGPoint(x: midX + 22, y: barY), isFlexed: depth < 0.4, isForeground: true)
         
         // Barbell
-        var bar = Path()
-        bar.move(to: CGPoint(x: midX - 45, y: barY))
-        bar.addLine(to: CGPoint(x: midX + 45, y: barY))
-        context.stroke(bar, with: .color(.white), lineWidth: 4)
-        
-        context.fill(Path(roundedRect: CGRect(x: midX - 48, y: barY - 12, width: 6, height: 24), cornerRadius: 2), with: .color(AscendTheme.cyan))
-        context.fill(Path(roundedRect: CGRect(x: midX + 42, y: barY - 12, width: 6, height: 24), cornerRadius: 2), with: .color(AscendTheme.cyan))
+        drawOlympicBarbell(context: context, center: CGPoint(x: midX, y: barY), width: 95)
     }
     
-    // MARK: - 3. Squat
-    private func drawSquat(context: GraphicsContext, size: CGSize, midX: CGFloat, midY: CGFloat, depth: CGFloat) {
-        // Floor
-        var floor = Path()
-        floor.move(to: CGPoint(x: midX - 70, y: midY + 70))
-        floor.addLine(to: CGPoint(x: midX + 70, y: midY + 70))
-        context.stroke(floor, with: .color(AscendTheme.textMuted.opacity(0.4)), lineWidth: 2)
+    // MARK: - 3. Sculpted Human Squat
+    private func drawHumanSquat(context: GraphicsContext, size: CGSize, midX: CGFloat, midY: CGFloat, depth: CGFloat) {
+        let floorY = midY + 74
+        drawGymFloor(context: context, midX: midX, floorY: floorY)
         
-        // Depth-dependent coordinates
-        // Standing: hip at midY + 15, knee at midY + 45, ankle at midY + 70
-        // Squatting: hip at midY + 44, pushed back to midX - 30; knee pushed forward to midX + 15
-        let hipX = midX - 5 - (depth * 25)
-        let hipY = (midY + 12) + (depth * 34)
+        // Dynamic biomechanical squat kinematics
+        let hipX = midX - 4 - (depth * 28)
+        let hipY = (midY + 14) + (depth * 36)
         
-        let shoulderX = midX + 2 - (depth * 10)
-        let shoulderY = (midY - 25) + (depth * 34)
+        let shoulderX = midX + 4 - (depth * 12)
+        let shoulderY = (midY - 24) + (depth * 36)
         
-        let kneeX = midX + 8 + (depth * 10)
-        let kneeY = (midY + 45) + (depth * 4)
+        let kneeX = midX + 10 + (depth * 12)
+        let kneeY = (midY + 44) + (depth * 6)
         
-        let footX = midX + 5
-        let footY = midY + 70
+        let ankleX = midX + 6
+        let ankleY = floorY
         
-        // Head
-        let headPos = CGPoint(x: shoulderX + 4, y: shoulderY - 16)
-        context.fill(Path(ellipseIn: CGRect(x: headPos.x - 9, y: headPos.y - 9, width: 18, height: 18)), with: .color(AscendTheme.textPrimary))
+        // 1. Far Leg
+        let farHip = CGPoint(x: hipX - 4, y: hipY - 2)
+        let farKnee = CGPoint(x: kneeX - 4, y: kneeY)
+        let farAnkle = CGPoint(x: ankleX - 4, y: ankleY)
+        drawMuscularLeg(context: context, hip: farHip, knee: farKnee, ankle: farAnkle, isForeground: false)
         
-        // Torso / Spine
-        var torso = Path()
-        torso.move(to: CGPoint(x: shoulderX, y: shoulderY))
-        torso.addLine(to: CGPoint(x: hipX, y: hipY))
-        context.stroke(torso, with: .color(AscendTheme.textPrimary), lineWidth: 5.5)
+        // 2. Torso with athletic back arch & spinal bracing
+        drawMuscularTorsoSide(
+            context: context,
+            shoulder: CGPoint(x: shoulderX, y: shoulderY),
+            hip: CGPoint(x: hipX, y: hipY),
+            pecSwell: 0.5,
+            isLyingDown: false
+        )
         
-        // Thigh
-        var thigh = Path()
-        thigh.move(to: CGPoint(x: hipX, y: hipY))
-        thigh.addLine(to: CGPoint(x: kneeX, y: kneeY))
-        context.stroke(thigh, with: .color(AscendTheme.emerald), lineWidth: 5)
+        // Head tilted proud
+        let headPos = CGPoint(x: shoulderX + 6, y: shoulderY - 16)
+        drawAthleticHead(context: context, center: headPos, angle: 0.1)
         
-        // Shin
-        var shin = Path()
-        shin.move(to: CGPoint(x: kneeX, y: kneeY))
-        shin.addLine(to: CGPoint(x: footX, y: footY))
-        context.stroke(shin, with: .color(AscendTheme.textSecondary), lineWidth: 4.5)
+        // 3. Near Leg with powerful quad teardrop flex
+        let nearHip = CGPoint(x: hipX, y: hipY)
+        let nearKnee = CGPoint(x: kneeX, y: kneeY)
+        let nearAnkle = CGPoint(x: ankleX, y: ankleY)
+        drawMuscularLeg(context: context, hip: nearHip, knee: nearKnee, ankle: nearAnkle, isForeground: true)
         
-        // Barbell across shoulders
+        // Barbell resting comfortably across traps
         let barY = shoulderY - 2
-        var bar = Path()
-        bar.move(to: CGPoint(x: shoulderX - 40, y: barY))
-        bar.addLine(to: CGPoint(x: shoulderX + 40, y: barY))
-        context.stroke(bar, with: .color(.white), lineWidth: 4)
+        let barCenter = CGPoint(x: shoulderX, y: barY)
+        drawOlympicBarbell(context: context, center: barCenter, width: 85)
         
-        context.fill(Path(roundedRect: CGRect(x: shoulderX - 44, y: barY - 16, width: 8, height: 32), cornerRadius: 3), with: .color(AscendTheme.cyan))
-        context.fill(Path(roundedRect: CGRect(x: shoulderX + 36, y: barY - 16, width: 8, height: 32), cornerRadius: 3), with: .color(AscendTheme.cyan))
-        
-        // Joint pivots
-        context.fill(Path(ellipseIn: CGRect(x: hipX - 4, y: hipY - 4, width: 8, height: 8)), with: .color(AscendTheme.cyan))
-        context.fill(Path(ellipseIn: CGRect(x: kneeX - 4, y: kneeY - 4, width: 8, height: 8)), with: .color(AscendTheme.cyan))
+        // Hands gripping bar
+        let handPos = CGPoint(x: shoulderX + 18, y: barY + 2)
+        drawMuscularArm(
+            context: context,
+            shoulder: CGPoint(x: shoulderX, y: shoulderY),
+            elbow: CGPoint(x: shoulderX + 10, y: shoulderY + 16),
+            hand: handPos,
+            isFlexed: true,
+            isForeground: true
+        )
     }
     
-    // MARK: - 4. Deadlift
-    private func drawDeadlift(context: GraphicsContext, size: CGSize, midX: CGFloat, midY: CGFloat, depth: CGFloat) {
-        var floor = Path()
-        floor.move(to: CGPoint(x: midX - 70, y: midY + 70))
-        floor.addLine(to: CGPoint(x: midX + 70, y: midY + 70))
-        context.stroke(floor, with: .color(AscendTheme.textMuted.opacity(0.4)), lineWidth: 2)
+    // MARK: - 4. Sculpted Human Deadlift
+    private func drawHumanDeadlift(context: GraphicsContext, size: CGSize, midX: CGFloat, midY: CGFloat, depth: CGFloat) {
+        let floorY = midY + 74
+        drawGymFloor(context: context, midX: midX, floorY: floorY)
         
-        // Hinge motion: depth = 0 is standing tall, depth = 1 is bent at bottom
-        let hipX = midX - 2 - (depth * 32)
-        let hipY = (midY + 15) + (depth * 15)
+        // Hinge kinematics
+        let hipX = midX - (depth * 34)
+        let hipY = (midY + 14) + (depth * 14)
         
-        let shoulderX = midX + 5 + (depth * 5)
-        let shoulderY = (midY - 25) + (depth * 45)
+        let shoulderX = midX + 8 + (depth * 6)
+        let shoulderY = (midY - 26) + (depth * 44)
         
-        let kneeX = midX + 4 + (depth * 6)
+        let kneeX = midX + 6 + (depth * 8)
         let kneeY = midY + 44
         
-        let footX = midX + 4
-        let footY = midY + 70
+        let ankleX = midX + 6
+        let ankleY = floorY
         
-        let barX = midX + 16
-        let barY = (midY + 15) + (depth * 50)
+        let barX = midX + 18
+        let barY = (midY + 14) + (depth * 52)
         
-        // Head
-        let headPos = CGPoint(x: shoulderX + (depth * 8), y: shoulderY - 14)
-        context.fill(Path(ellipseIn: CGRect(x: headPos.x - 9, y: headPos.y - 9, width: 18, height: 18)), with: .color(AscendTheme.textPrimary))
+        // Far Leg
+        drawMuscularLeg(context: context, hip: CGPoint(x: hipX - 4, y: hipY), knee: CGPoint(x: kneeX - 4, y: kneeY), ankle: CGPoint(x: ankleX - 4, y: ankleY), isForeground: false)
         
-        // Flat Spine
-        var spine = Path()
-        spine.move(to: CGPoint(x: shoulderX, y: shoulderY))
-        spine.addLine(to: CGPoint(x: hipX, y: hipY))
-        context.stroke(spine, with: .color(AscendTheme.emerald), lineWidth: 5.5)
+        // Torso & flat neutral spine
+        drawMuscularTorsoSide(context: context, shoulder: CGPoint(x: shoulderX, y: shoulderY), hip: CGPoint(x: hipX, y: hipY), pecSwell: 0.4, isLyingDown: false)
+        drawAthleticHead(context: context, center: CGPoint(x: shoulderX + 8, y: shoulderY - 14), angle: 0.1)
+        
+        // Near Leg
+        drawMuscularLeg(context: context, hip: CGPoint(x: hipX, y: hipY), knee: CGPoint(x: kneeX, y: kneeY), ankle: CGPoint(x: ankleX, y: ankleY), isForeground: true)
+        
+        // Long straight arms dragging bar along shins
+        drawMuscularArm(
+            context: context,
+            shoulder: CGPoint(x: shoulderX, y: shoulderY),
+            elbow: CGPoint(x: (shoulderX + barX) / 2, y: (shoulderY + barY) / 2),
+            hand: CGPoint(x: barX, y: barY),
+            isFlexed: true,
+            isForeground: true
+        )
+        
+        // Olympic Barbell with large 450mm diameter bumper plates
+        drawOlympicBarbell(context: context, center: CGPoint(x: barX, y: barY), width: 80, plateRadius: 20)
+    }
+    
+    // MARK: - 5. Sculpted Human Pull-Up
+    private func drawHumanPullUp(context: GraphicsContext, size: CGSize, midX: CGFloat, midY: CGFloat, depth: CGFloat) {
+        // Overhead bar
+        var bar = Path()
+        bar.move(to: CGPoint(x: midX - 65, y: midY - 62))
+        bar.addLine(to: CGPoint(x: midX + 65, y: midY - 62))
+        context.stroke(bar, with: .color(Color(white: 0.8)), lineWidth: 5)
+        
+        let bodyOffset = (1.0 - depth) * 44
+        let shoulderY = (midY - 26) + bodyOffset
+        let hipY = (midY + 16) + bodyOffset
+        
+        // Torso with lat flare
+        drawMuscularTorsoFront(context: context, shoulder: CGPoint(x: midX, y: shoulderY), hip: CGPoint(x: midX, y: hipY), deltoidFlex: depth)
+        drawAthleticHead(context: context, center: CGPoint(x: midX, y: shoulderY - 16), angle: 0)
+        
+        // Legs with slight athletic knee tuck
+        drawMuscularLeg(context: context, hip: CGPoint(x: midX, y: hipY), knee: CGPoint(x: midX - 6, y: hipY + 30), ankle: CGPoint(x: midX - 12, y: hipY + 54), isForeground: true)
+        
+        // Muscular arms pulling to bar
+        let handLeft = CGPoint(x: midX - 36, y: midY - 62)
+        let handRight = CGPoint(x: midX + 36, y: midY - 62)
+        
+        let elbowLeft = CGPoint(x: midX - 26 - (depth * 8), y: shoulderY + 4)
+        let elbowRight = CGPoint(x: midX + 26 + (depth * 8), y: shoulderY + 4)
+        
+        drawMuscularArm(context: context, shoulder: CGPoint(x: midX - 16, y: shoulderY), elbow: elbowLeft, hand: handLeft, isFlexed: depth > 0.5, isForeground: true)
+        drawMuscularArm(context: context, shoulder: CGPoint(x: midX + 16, y: shoulderY), elbow: elbowRight, hand: handRight, isFlexed: depth > 0.5, isForeground: true)
+    }
+    
+    // MARK: - 6. Sculpted Human Bent-Over Row
+    private func drawHumanBentOverRow(context: GraphicsContext, size: CGSize, midX: CGFloat, midY: CGFloat, depth: CGFloat) {
+        let floorY = midY + 74
+        drawGymFloor(context: context, midX: midX, floorY: floorY)
+        
+        let hip = CGPoint(x: midX - 26, y: midY + 14)
+        let shoulder = CGPoint(x: midX + 16, y: midY - 14)
         
         // Legs
-        var legPath = Path()
-        legPath.move(to: CGPoint(x: hipX, y: hipY))
-        legPath.addLine(to: CGPoint(x: kneeX, y: kneeY))
-        legPath.addLine(to: CGPoint(x: footX, y: footY))
-        context.stroke(legPath, with: .color(AscendTheme.textSecondary), lineWidth: 4.5)
+        drawMuscularLeg(context: context, hip: hip, knee: CGPoint(x: midX - 10, y: midY + 44), ankle: CGPoint(x: midX - 6, y: floorY), isForeground: true)
         
-        // Arms straight hanging to bar
-        var arm = Path()
-        arm.move(to: CGPoint(x: shoulderX, y: shoulderY))
-        arm.addLine(to: CGPoint(x: barX, y: barY))
-        context.stroke(arm, with: .color(.white), lineWidth: 3.5)
+        // Torso
+        drawMuscularTorsoSide(context: context, shoulder: shoulder, hip: hip, pecSwell: 0.3, isLyingDown: false)
+        drawAthleticHead(context: context, center: CGPoint(x: shoulder.x + 12, y: shoulder.y - 12), angle: 0.1)
         
-        // Barbell & big plates
-        var bar = Path()
-        bar.move(to: CGPoint(x: barX - 35, y: barY))
-        bar.addLine(to: CGPoint(x: barX + 35, y: barY))
-        context.stroke(bar, with: .color(.white), lineWidth: 4)
+        // Bar path: pulling from midY + 34 up into lower ribs (midY - 2)
+        let barX = midX + 6
+        let barY = (midY + 34) - (depth * 36)
         
-        context.fill(Path(ellipseIn: CGRect(x: barX - 42, y: barY - 18, width: 10, height: 36)), with: .color(AscendTheme.cyan))
-        context.fill(Path(ellipseIn: CGRect(x: barX + 32, y: barY - 18, width: 10, height: 36)), with: .color(AscendTheme.cyan))
+        let elbowX = (midX + 6) - (depth * 24)
+        let elbowY = (midY + 8) - (depth * 18)
+        
+        drawMuscularArm(context: context, shoulder: shoulder, elbow: CGPoint(x: elbowX, y: elbowY), hand: CGPoint(x: barX, y: barY), isFlexed: depth > 0.5, isForeground: true)
+        drawOlympicBarbell(context: context, center: CGPoint(x: barX, y: barY), width: 75)
     }
     
-    // MARK: - 5. Pull-Up
-    private func drawPullUp(context: GraphicsContext, size: CGSize, midX: CGFloat, midY: CGFloat, depth: CGFloat) {
-        // Pull-Up Bar at top
-        var bar = Path()
-        bar.move(to: CGPoint(x: midX - 60, y: midY - 60))
-        bar.addLine(to: CGPoint(x: midX + 60, y: midY - 60))
-        context.stroke(bar, with: .color(.white), lineWidth: 5)
+    // MARK: - 7. Sculpted Human Bicep Curl
+    private func drawHumanBicepCurl(context: GraphicsContext, size: CGSize, midX: CGFloat, midY: CGFloat, depth: CGFloat) {
+        let floorY = midY + 74
+        drawGymFloor(context: context, midX: midX, floorY: floorY)
         
-        // Body hangs and moves up: depth = 0 is at bottom (dead hang), depth = 1 is chin over bar
-        // Note: in pull-up, concentric brings body UP towards bar
-        let bodyYOffset = (1.0 - depth) * 45
+        let hip = CGPoint(x: midX - 4, y: midY + 20)
+        let shoulder = CGPoint(x: midX - 4, y: midY - 20)
         
-        let headPos = CGPoint(x: midX, y: (midY - 45) + bodyYOffset)
-        let shoulderPos = CGPoint(x: midX, y: (midY - 28) + bodyYOffset)
-        let hipPos = CGPoint(x: midX, y: (midY + 15) + bodyYOffset)
+        drawMuscularLeg(context: context, hip: hip, knee: CGPoint(x: midX - 4, y: midY + 48), ankle: CGPoint(x: midX - 4, y: floorY), isForeground: true)
+        drawMuscularTorsoSide(context: context, shoulder: shoulder, hip: hip, pecSwell: 0.4, isLyingDown: false)
+        drawAthleticHead(context: context, center: CGPoint(x: midX - 4, y: shoulder.y - 16), angle: 0)
         
-        context.fill(Path(ellipseIn: CGRect(x: headPos.x - 9, y: headPos.y - 9, width: 18, height: 18)), with: .color(AscendTheme.textPrimary))
-        
-        var torso = Path()
-        torso.move(to: shoulderPos)
-        torso.addLine(to: hipPos)
-        context.stroke(torso, with: .color(AscendTheme.textPrimary), lineWidth: 5)
-        
-        // Legs with slight knee bend
-        var legs = Path()
-        legs.move(to: hipPos)
-        legs.addLine(to: CGPoint(x: midX - 4, y: (midY + 45) + bodyYOffset))
-        legs.addLine(to: CGPoint(x: midX - 10, y: (midY + 68) + bodyYOffset))
-        context.stroke(legs, with: .color(AscendTheme.textSecondary), lineWidth: 4)
-        
-        // Arms to bar
-        let handLeft = CGPoint(x: midX - 35, y: midY - 60)
-        let handRight = CGPoint(x: midX + 35, y: midY - 60)
-        
-        let elbowLeftY = shoulderPos.y + (depth * 5)
-        let elbowRightY = shoulderPos.y + (depth * 5)
-        let elbowLeftX = midX - 25 - (depth * 8)
-        let elbowRightX = midX + 25 + (depth * 8)
-        
-        var armLeft = Path()
-        armLeft.move(to: shoulderPos)
-        armLeft.addLine(to: CGPoint(x: elbowLeftX, y: elbowLeftY))
-        armLeft.addLine(to: handLeft)
-        context.stroke(armLeft, with: .color(AscendTheme.emerald), lineWidth: 3.5)
-        
-        var armRight = Path()
-        armRight.move(to: shoulderPos)
-        armRight.addLine(to: CGPoint(x: elbowRightX, y: elbowRightY))
-        armRight.addLine(to: handRight)
-        context.stroke(armRight, with: .color(AscendTheme.emerald), lineWidth: 3.5)
-    }
-    
-    // MARK: - 6. Bent-Over Row
-    private func drawBentOverRow(context: GraphicsContext, size: CGSize, midX: CGFloat, midY: CGFloat, depth: CGFloat) {
-        var floor = Path()
-        floor.move(to: CGPoint(x: midX - 60, y: midY + 70))
-        floor.addLine(to: CGPoint(x: midX + 60, y: midY + 70))
-        context.stroke(floor, with: .color(AscendTheme.textMuted.opacity(0.4)), lineWidth: 2)
-        
-        // Fixed 45-degree hinge torso
-        let hip = CGPoint(x: midX - 25, y: midY + 15)
-        let shoulder = CGPoint(x: midX + 15, y: midY - 15)
-        let head = CGPoint(x: midX + 28, y: midY - 26)
-        
-        context.fill(Path(ellipseIn: CGRect(x: head.x - 9, y: head.y - 9, width: 18, height: 18)), with: .color(AscendTheme.textPrimary))
-        
-        var spine = Path()
-        spine.move(to: shoulder)
-        spine.addLine(to: hip)
-        context.stroke(spine, with: .color(AscendTheme.textPrimary), lineWidth: 5)
-        
-        // Legs
-        var legs = Path()
-        legs.move(to: hip)
-        legs.addLine(to: CGPoint(x: midX - 10, y: midY + 45))
-        legs.addLine(to: CGPoint(x: midX - 5, y: midY + 70))
-        context.stroke(legs, with: .color(AscendTheme.textSecondary), lineWidth: 4.5)
-        
-        // Row bar motion: depth = 0 is arms hanging (midY + 35), depth = 1 is bar pulled to ribs (midY - 2)
-        let barX = midX + 5
-        let barY = (midY + 35) - (depth * 37)
-        
-        let elbowX = (midX + 5) - (depth * 25)
-        let elbowY = (midY + 10) - (depth * 20)
-        
-        var arm = Path()
-        arm.move(to: shoulder)
-        arm.addLine(to: CGPoint(x: elbowX, y: elbowY))
-        arm.addLine(to: CGPoint(x: barX, y: barY))
-        context.stroke(arm, with: .color(AscendTheme.emerald), lineWidth: 3.5)
-        
-        // Barbell
-        var bar = Path()
-        bar.move(to: CGPoint(x: barX - 35, y: barY))
-        bar.addLine(to: CGPoint(x: barX + 35, y: barY))
-        context.stroke(bar, with: .color(.white), lineWidth: 4)
-        context.fill(Path(roundedRect: CGRect(x: barX - 38, y: barY - 12, width: 6, height: 24), cornerRadius: 2), with: .color(AscendTheme.cyan))
-        context.fill(Path(roundedRect: CGRect(x: barX + 32, y: barY - 12, width: 6, height: 24), cornerRadius: 2), with: .color(AscendTheme.cyan))
-    }
-    
-    // MARK: - 7. Bicep Curl
-    private func drawBicepCurl(context: GraphicsContext, size: CGSize, midX: CGFloat, midY: CGFloat, depth: CGFloat) {
-        let headPos = CGPoint(x: midX, y: midY - 40)
-        let shoulderPos = CGPoint(x: midX, y: midY - 20)
-        let elbowPos = CGPoint(x: midX + 8, y: midY + 10)
-        
-        context.fill(Path(ellipseIn: CGRect(x: headPos.x - 9, y: headPos.y - 9, width: 18, height: 18)), with: .color(AscendTheme.textPrimary))
-        
-        var torso = Path()
-        torso.move(to: shoulderPos)
-        torso.addLine(to: CGPoint(x: midX, y: midY + 30))
-        context.stroke(torso, with: .color(AscendTheme.textPrimary), lineWidth: 5)
-        
-        // Upper arm stays pinned
-        var upperArm = Path()
-        upperArm.move(to: shoulderPos)
-        upperArm.addLine(to: elbowPos)
-        context.stroke(upperArm, with: .color(AscendTheme.textSecondary), lineWidth: 4)
-        
-        // Forearm curls up: depth = 0 is hanging down, depth = 1 is curled to shoulder
-        let angle: CGFloat = (.pi / 2) - (depth * 2.4)
+        let elbow = CGPoint(x: midX + 6, y: midY + 8)
+        let curlAngle: CGFloat = (.pi / 2) - (depth * 2.3)
         let forearmLength: CGFloat = 36
-        let handX = elbowPos.x + (cos(angle) * forearmLength)
-        let handY = elbowPos.y + (sin(angle) * forearmLength)
+        let hand = CGPoint(x: elbow.x + (cos(curlAngle) * forearmLength), y: elbow.y + (sin(curlAngle) * forearmLength))
         
-        var forearm = Path()
-        forearm.move(to: elbowPos)
-        forearm.addLine(to: CGPoint(x: handX, y: handY))
-        context.stroke(forearm, with: .color(AscendTheme.emerald), lineWidth: 4)
+        drawMuscularArm(context: context, shoulder: shoulder, elbow: elbow, hand: hand, isFlexed: depth > 0.5, isForeground: true)
         
-        // Dumbbell
-        context.fill(Path(roundedRect: CGRect(x: handX - 10, y: handY - 7, width: 20, height: 14), cornerRadius: 3), with: .color(AscendTheme.cyan))
+        // Dumbbell in hand
+        context.fill(Path(roundedRect: CGRect(x: hand.x - 10, y: hand.y - 7, width: 20, height: 14), cornerRadius: 4), with: .color(AscendTheme.cyan))
+        context.stroke(Path(roundedRect: CGRect(x: hand.x - 10, y: hand.y - 7, width: 20, height: 14), cornerRadius: 4), with: .color(.white), lineWidth: 1.5)
     }
     
-    // MARK: - 8. Tricep Pushdown
-    private func drawTricepPushdown(context: GraphicsContext, size: CGSize, midX: CGFloat, midY: CGFloat, depth: CGFloat) {
-        // Cable top
-        var cableTop = Path()
-        cableTop.move(to: CGPoint(x: midX + 22, y: midY - 60))
-        cableTop.addLine(to: CGPoint(x: midX + 22, y: midY - 10))
-        context.stroke(cableTop, with: .color(AscendTheme.textMuted), lineWidth: 2)
+    // MARK: - 8. Sculpted Human Tricep Pushdown
+    private func drawHumanTricepPushdown(context: GraphicsContext, size: CGSize, midX: CGFloat, midY: CGFloat, depth: CGFloat) {
+        let floorY = midY + 74
+        drawGymFloor(context: context, midX: midX, floorY: floorY)
         
-        let headPos = CGPoint(x: midX - 15, y: midY - 35)
-        let shoulderPos = CGPoint(x: midX - 8, y: midY - 15)
-        let elbowPos = CGPoint(x: midX + 5, y: midY + 8)
+        // Cable tower guide
+        var cable = Path()
+        cable.move(to: CGPoint(x: midX + 24, y: midY - 65))
+        cable.addLine(to: CGPoint(x: midX + 24, y: midY - 6))
+        context.stroke(cable, with: .color(Color(white: 0.4)), lineWidth: 2)
         
-        context.fill(Path(ellipseIn: CGRect(x: headPos.x - 9, y: headPos.y - 9, width: 18, height: 18)), with: .color(AscendTheme.textPrimary))
+        let hip = CGPoint(x: midX - 16, y: midY + 24)
+        let shoulder = CGPoint(x: midX - 8, y: midY - 14)
         
-        var torso = Path()
-        torso.move(to: shoulderPos)
-        torso.addLine(to: CGPoint(x: midX - 18, y: midY + 35))
-        context.stroke(torso, with: .color(AscendTheme.textPrimary), lineWidth: 5)
+        drawMuscularLeg(context: context, hip: hip, knee: CGPoint(x: midX - 10, y: midY + 50), ankle: CGPoint(x: midX - 8, y: floorY), isForeground: true)
+        drawMuscularTorsoSide(context: context, shoulder: shoulder, hip: hip, pecSwell: 0.3, isLyingDown: false)
+        drawAthleticHead(context: context, center: CGPoint(x: shoulder.x - 4, y: shoulder.y - 16), angle: -0.1)
         
-        var upperArm = Path()
-        upperArm.move(to: shoulderPos)
-        upperArm.addLine(to: elbowPos)
-        context.stroke(upperArm, with: .color(AscendTheme.textSecondary), lineWidth: 4)
-        
-        // Pushdown: depth = 0 is bent 90 degrees, depth = 1 is locked out straight down
+        let elbow = CGPoint(x: midX + 4, y: midY + 8)
         let angle: CGFloat = (-0.2) + (depth * 1.7)
-        let handX = elbowPos.x + (cos(angle) * 35)
-        let handY = elbowPos.y + (sin(angle) * 35)
+        let hand = CGPoint(x: elbow.x + (cos(angle) * 36), y: elbow.y + (sin(angle) * 36))
         
-        var forearm = Path()
-        forearm.move(to: elbowPos)
-        forearm.addLine(to: CGPoint(x: handX, y: handY))
-        context.stroke(forearm, with: .color(AscendTheme.emerald), lineWidth: 4)
-        
-        // Rope handle
-        var handle = Path()
-        handle.move(to: CGPoint(x: handX - 8, y: handY + 4))
-        handle.addLine(to: CGPoint(x: handX + 8, y: handY - 4))
-        context.stroke(handle, with: .color(AscendTheme.cyan), lineWidth: 4)
+        drawMuscularArm(context: context, shoulder: shoulder, elbow: elbow, hand: hand, isFlexed: depth > 0.6, isForeground: true)
     }
     
-    // MARK: - 9. Core Hanging Leg Raise
-    private func drawCoreHangingLegRaise(context: GraphicsContext, size: CGSize, midX: CGFloat, midY: CGFloat, depth: CGFloat) {
+    // MARK: - 9. Sculpted Human Core Leg Raise
+    private func drawHumanCoreLegRaise(context: GraphicsContext, size: CGSize, midX: CGFloat, midY: CGFloat, depth: CGFloat) {
         var bar = Path()
-        bar.move(to: CGPoint(x: midX - 50, y: midY - 60))
-        bar.addLine(to: CGPoint(x: midX + 50, y: midY - 60))
-        context.stroke(bar, with: .color(.white), lineWidth: 4.5)
+        bar.move(to: CGPoint(x: midX - 55, y: midY - 60))
+        bar.addLine(to: CGPoint(x: midX + 55, y: midY - 60))
+        context.stroke(bar, with: .color(Color(white: 0.8)), lineWidth: 5)
         
-        let handPos = CGPoint(x: midX, y: midY - 60)
-        let shoulderPos = CGPoint(x: midX, y: midY - 30)
-        let hipPos = CGPoint(x: midX, y: midY + 15)
+        let shoulder = CGPoint(x: midX, y: midY - 28)
+        let hip = CGPoint(x: midX, y: midY + 16)
         
-        context.fill(Path(ellipseIn: CGRect(x: midX - 8, y: midY - 48, width: 16, height: 16)), with: .color(AscendTheme.textPrimary))
+        // Overhead arms hanging
+        drawMuscularArm(context: context, shoulder: shoulder, elbow: CGPoint(x: midX, y: midY - 44), hand: CGPoint(x: midX, y: midY - 60), isFlexed: false, isForeground: true)
         
-        var arms = Path()
-        arms.move(to: handPos)
-        arms.addLine(to: shoulderPos)
-        context.stroke(arms, with: .color(.white), lineWidth: 4)
+        // Torso
+        drawMuscularTorsoFront(context: context, shoulder: shoulder, hip: hip, deltoidFlex: 0.3)
+        drawAthleticHead(context: context, center: CGPoint(x: midX, y: shoulder.y - 16), angle: 0)
         
-        var torso = Path()
-        torso.move(to: shoulderPos)
-        torso.addLine(to: hipPos)
-        context.stroke(torso, with: .color(AscendTheme.emerald), lineWidth: 5)
-        
-        // Legs hinge up: depth = 0 is straight down, depth = 1 is horizontal 90 degrees
+        // Legs lifting up
         let legAngle: CGFloat = (.pi / 2) - (depth * (.pi / 2))
-        let footX = hipPos.x + (cos(legAngle) * 55)
-        let footY = hipPos.y + (sin(legAngle) * 55)
+        let knee = CGPoint(x: hip.x + (cos(legAngle) * 32), y: hip.y + (sin(legAngle) * 32))
+        let foot = CGPoint(x: hip.x + (cos(legAngle) * 58), y: hip.y + (sin(legAngle) * 58))
         
-        var legs = Path()
-        legs.move(to: hipPos)
-        legs.addLine(to: CGPoint(x: footX, y: footY))
-        context.stroke(legs, with: .color(AscendTheme.cyan), lineWidth: 4.5)
+        drawMuscularLeg(context: context, hip: hip, knee: knee, ankle: foot, isForeground: true)
+    }
+    
+    // MARK: - Anatomical Component Rendering Helpers
+    
+    private func drawAthleticHead(context: GraphicsContext, center: CGPoint, angle: CGFloat) {
+        let headBox = CGRect(x: center.x - 9, y: center.y - 10, width: 18, height: 20)
+        context.fill(Path(ellipseIn: headBox), with: .color(AscendTheme.textPrimary))
+        // Athletic jaw contour
+        var jaw = Path()
+        jaw.move(to: CGPoint(x: center.x - 8, y: center.y + 2))
+        jaw.addLine(to: CGPoint(x: center.x + 2, y: center.y + 8))
+        jaw.addLine(to: CGPoint(x: center.x + 8, y: center.y + 2))
+        context.fill(jaw, with: .color(AscendTheme.textPrimary))
+    }
+    
+    private func drawMuscularTorsoSide(
+        context: GraphicsContext,
+        shoulder: CGPoint,
+        hip: CGPoint,
+        pecSwell: CGFloat,
+        isLyingDown: Bool
+    ) {
+        var torso = Path()
+        let pecThickness: CGFloat = 16 + (pecSwell * 6)
+        
+        if isLyingDown {
+            // Lying flat with chest facing upward
+            torso.move(to: CGPoint(x: shoulder.x - 10, y: shoulder.y + 10))
+            torso.addCurve(
+                to: CGPoint(x: hip.x, y: hip.y + 8),
+                control1: CGPoint(x: shoulder.x + 8, y: shoulder.y - pecThickness),
+                control2: CGPoint(x: hip.x - 8, y: hip.y - 2)
+            )
+            torso.addLine(to: CGPoint(x: hip.x, y: hip.y + 12))
+            torso.addLine(to: CGPoint(x: shoulder.x - 10, y: shoulder.y + 12))
+            torso.closeSubpath()
+        } else {
+            // Standing or inclined V-taper torso
+            torso.move(to: CGPoint(x: shoulder.x - 8, y: shoulder.y))
+            torso.addCurve(
+                to: CGPoint(x: hip.x, y: hip.y),
+                control1: CGPoint(x: shoulder.x + pecThickness, y: (shoulder.y + hip.y) / 2),
+                control2: CGPoint(x: hip.x + 4, y: hip.y - 4)
+            )
+            torso.addLine(to: CGPoint(x: hip.x - 10, y: hip.y))
+            torso.addLine(to: CGPoint(x: shoulder.x - 10, y: shoulder.y))
+            torso.closeSubpath()
+        }
+        
+        let torsoColor = pecSwell > 0.6 ? AscendTheme.emerald.opacity(0.85) : Color(white: 0.88)
+        context.fill(torso, with: .color(torsoColor))
+        context.stroke(torso, with: .color(.white), lineWidth: 1.5)
+    }
+    
+    private func drawMuscularTorsoFront(
+        context: GraphicsContext,
+        shoulder: CGPoint,
+        hip: CGPoint,
+        deltoidFlex: CGFloat
+    ) {
+        var torso = Path()
+        torso.move(to: CGPoint(x: shoulder.x - 18, y: shoulder.y))
+        torso.addLine(to: CGPoint(x: shoulder.x + 18, y: shoulder.y))
+        torso.addCurve(
+            to: CGPoint(x: hip.x + 10, y: hip.y),
+            control1: CGPoint(x: shoulder.x + 22, y: shoulder.y + 16),
+            control2: CGPoint(x: hip.x + 12, y: hip.y - 6)
+        )
+        torso.addLine(to: CGPoint(x: hip.x - 10, y: hip.y))
+        torso.addCurve(
+            to: CGPoint(x: shoulder.x - 18, y: shoulder.y),
+            control1: CGPoint(x: hip.x - 12, y: hip.y - 6),
+            control2: CGPoint(x: shoulder.x - 22, y: shoulder.y + 16)
+        )
+        torso.closeSubpath()
+        
+        let color = deltoidFlex > 0.6 ? AscendTheme.emerald.opacity(0.85) : Color(white: 0.88)
+        context.fill(torso, with: .color(color))
+        context.stroke(torso, with: .color(.white), lineWidth: 1.5)
+    }
+    
+    private func drawMuscularArm(
+        context: GraphicsContext,
+        shoulder: CGPoint,
+        elbow: CGPoint,
+        hand: CGPoint,
+        isFlexed: Bool,
+        isForeground: Bool
+    ) {
+        let baseColor: Color = isForeground ? (isFlexed ? AscendTheme.emerald : Color.white) : Color(white: 0.45)
+        let armThickness: CGFloat = isFlexed ? 7.5 : 6.0
+        
+        // Upper Arm (Bicep / Tricep)
+        var upperArm = Path()
+        upperArm.move(to: shoulder)
+        upperArm.addLine(to: elbow)
+        context.stroke(upperArm, with: .color(baseColor), style: StrokeStyle(lineWidth: armThickness, lineCap: .round))
+        
+        // Forearm
+        var forearm = Path()
+        forearm.move(to: elbow)
+        forearm.addLine(to: hand)
+        context.stroke(forearm, with: .color(baseColor), style: StrokeStyle(lineWidth: armThickness - 1.0, lineCap: .round))
+        
+        // Joint Caps
+        context.fill(Path(ellipseIn: CGRect(x: shoulder.x - 4, y: shoulder.y - 4, width: 8, height: 8)), with: .color(AscendTheme.cyan))
+        context.fill(Path(ellipseIn: CGRect(x: elbow.x - 3, y: elbow.y - 3, width: 6, height: 6)), with: .color(AscendTheme.cyan))
+    }
+    
+    private func drawMuscularLeg(
+        context: GraphicsContext,
+        hip: CGPoint,
+        knee: CGPoint,
+        ankle: CGPoint,
+        isForeground: Bool
+    ) {
+        let legColor: Color = isForeground ? Color(white: 0.85) : Color(white: 0.45)
+        
+        // Thigh (Quadriceps / Hamstring curve)
+        var thigh = Path()
+        thigh.move(to: hip)
+        thigh.addLine(to: knee)
+        context.stroke(thigh, with: .color(legColor), style: StrokeStyle(lineWidth: 9.0, lineCap: .round))
+        
+        // Calf & Shin
+        var calf = Path()
+        calf.move(to: knee)
+        calf.addLine(to: ankle)
+        context.stroke(calf, with: .color(legColor), style: StrokeStyle(lineWidth: 7.0, lineCap: .round))
+        
+        // Athletic lifting shoe / foot
+        var foot = Path()
+        foot.move(to: ankle)
+        foot.addLine(to: CGPoint(x: ankle.x + 14, y: ankle.y))
+        context.stroke(foot, with: .color(AscendTheme.cyan), style: StrokeStyle(lineWidth: 4.5, lineCap: .round))
+    }
+    
+    private func drawOlympicBarbell(context: GraphicsContext, center: CGPoint, width: CGFloat, plateRadius: CGFloat = 16) {
+        // Steel Olympic Bar with knurled silver finish
+        var bar = Path()
+        bar.move(to: CGPoint(x: center.x - (width / 2), y: center.y))
+        bar.addLine(to: CGPoint(x: center.x + (width / 2), y: center.y))
+        context.stroke(bar, with: .color(Color(white: 0.95)), lineWidth: 4)
+        
+        // Inner collar sleeves
+        let leftCollarX = center.x - (width / 2) + 6
+        let rightCollarX = center.x + (width / 2) - 12
+        context.fill(Path(roundedRect: CGRect(x: leftCollarX, y: center.y - 4, width: 4, height: 8), cornerRadius: 1), with: .color(Color(white: 0.6)))
+        context.fill(Path(roundedRect: CGRect(x: rightCollarX, y: center.y - 4, width: 4, height: 8), cornerRadius: 1), with: .color(Color(white: 0.6)))
+        
+        // Metallic Olympic Bumper Plates (20 KG)
+        let leftPlate = CGRect(x: center.x - (width / 2) - 4, y: center.y - plateRadius, width: 8, height: plateRadius * 2)
+        let rightPlate = CGRect(x: center.x + (width / 2) - 4, y: center.y - plateRadius, width: 8, height: plateRadius * 2)
+        
+        context.fill(Path(roundedRect: leftPlate, cornerRadius: 3), with: .color(AscendTheme.cyan))
+        context.stroke(Path(roundedRect: leftPlate, cornerRadius: 3), with: .color(.white), lineWidth: 1.5)
+        
+        context.fill(Path(roundedRect: rightPlate, cornerRadius: 3), with: .color(AscendTheme.cyan))
+        context.stroke(Path(roundedRect: rightPlate, cornerRadius: 3), with: .color(.white), lineWidth: 1.5)
+    }
+    
+    private func drawGymFloor(context: GraphicsContext, midX: CGFloat, floorY: CGFloat) {
+        var floor = Path()
+        floor.move(to: CGPoint(x: midX - 85, y: floorY))
+        floor.addLine(to: CGPoint(x: midX + 85, y: floorY))
+        context.stroke(floor, with: .color(Color(white: 0.35)), lineWidth: 3)
     }
 }
 
-// Subtle futuristic background grid
-private struct GridBackground: View {
+// Architectural Stage Grid
+private struct GymStageGrid: View {
     var body: some View {
         Canvas { context, size in
             let step: CGFloat = 20

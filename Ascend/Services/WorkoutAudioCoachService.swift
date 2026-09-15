@@ -10,6 +10,7 @@ public final class WorkoutAudioCoachService: NSObject, AVSpeechSynthesizerDelega
     public var isMuted: Bool = false
     public var currentSpokenText: String = ""
     public var audioWaveLevel: CGFloat = 0.0
+    public var activeVoiceName: String = "Coach Voice"
     
     private let synthesizer = AVSpeechSynthesizer()
     private var waveTimer: Timer?
@@ -18,6 +19,12 @@ public final class WorkoutAudioCoachService: NSObject, AVSpeechSynthesizerDelega
     override private init() {
         super.init()
         synthesizer.delegate = self
+        updateActiveVoiceName()
+    }
+    
+    private func updateActiveVoiceName() {
+        let voice = selectOptimalVoice()
+        activeVoiceName = voice?.name ?? "Natural Coach"
     }
     
     private func ensureAudioSessionConfigured() {
@@ -35,12 +42,39 @@ public final class WorkoutAudioCoachService: NSObject, AVSpeechSynthesizerDelega
             print("WorkoutAudioCoachService: AVAudioSession error: \(error.localizedDescription)")
         }
         #else
-        // In iOS Simulator, avoid IPCAUClient IPC connection failures to Mac host audio
         try? AVAudioSession.sharedInstance().setCategory(.ambient, mode: .default)
         #endif
     }
     
-    public func speak(text: String, rate: Float = 0.48, pitch: Float = 1.0) {
+    /// Selects the highest quality neural or natural human voice available on the device
+    private func selectOptimalVoice() -> AVSpeechSynthesisVoice? {
+        let allVoices = AVSpeechSynthesisVoice.speechVoices()
+        
+        // 1. Premium Neural Voices (e.g. Ava Premium, Zoe Premium, Evan Premium)
+        if let premium = allVoices.first(where: { $0.language.hasPrefix("en") && $0.quality == .premium }) {
+            return premium
+        }
+        
+        // 2. Enhanced Quality Voices (e.g. Siri Neural, Samantha Enhanced, Ava Enhanced)
+        if let enhanced = allVoices.first(where: { $0.language.hasPrefix("en") && $0.quality == .enhanced }) {
+            return enhanced
+        }
+        
+        // 3. High-inflection British English voice (Daniel / Oliver) which provides superior natural prosody
+        if let british = AVSpeechSynthesisVoice(language: "en-GB") {
+            return british
+        }
+        
+        // 4. Australian English voice (Karen / Lee)
+        if let australian = AVSpeechSynthesisVoice(language: "en-AU") {
+            return australian
+        }
+        
+        // 5. Default US English
+        return AVSpeechSynthesisVoice(language: "en-US")
+    }
+    
+    public func speak(text: String, rate: Float = 0.51, pitch: Float = 1.01) {
         guard !isMuted else { return }
         let cleanText = text.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !cleanText.isEmpty else { return }
@@ -62,38 +96,51 @@ public final class WorkoutAudioCoachService: NSObject, AVSpeechSynthesizerDelega
         let utterance = AVSpeechUtterance(string: cleanText)
         utterance.rate = rate
         utterance.pitchMultiplier = pitch
-        utterance.preUtteranceDelay = 0.05
-        utterance.postUtteranceDelay = 0.1
+        utterance.preUtteranceDelay = 0.08
+        utterance.postUtteranceDelay = 0.15
         
-        // Pick best English voice available
-        if let voice = AVSpeechSynthesisVoice(language: "en-US") {
+        if let voice = selectOptimalVoice() {
             utterance.voice = voice
+            activeVoiceName = voice.name
         }
         
         synthesizer.speak(utterance)
     }
     
+    // MARK: - Conversational Athletic Coaching Scripts
     public func speakExerciseOverview(
         name: String,
         muscleGroup: String,
         setup: String,
         execution: String
     ) {
+        let cleanSetup = setup
+            .replacingOccurrences(of: "Step 1:", with: "")
+            .replacingOccurrences(of: "Setup:", with: "")
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+        
+        let cleanExecution = execution
+            .replacingOccurrences(of: "Step 2:", with: "")
+            .replacingOccurrences(of: "Execution:", with: "")
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+        
         let script = """
-        \(name). Target muscle: \(muscleGroup).
-        Setup: \(setup)
-        Movement: \(execution)
+        Alright, let's lock in for the \(name)... Target muscle: \(muscleGroup).
+        For your setup... \(cleanSetup).
+        Now for the movement... \(cleanExecution)...
+        Control the negative, breathe through the rep, and drive with power.
         """
         speak(text: script)
     }
     
     public func speakFormCues(name: String, cues: [String]) {
         guard !cues.isEmpty else { return }
-        let cuesScript = cues.prefix(3).enumerated().map { index, cue in
-            "Cue \(index + 1): \(cue)."
-        }.joined(separator: " ")
+        let formattedCues = cues.prefix(3).map { cue in
+            cue.trimmingCharacters(in: .punctuationCharacters)
+        }.joined(separator: "... Next cue: ")
         
-        speak(text: "\(name) technique cues. \(cuesScript)")
+        let script = "Key form cues for the \(name)... First, \(formattedCues)... Focus on that mind-muscle connection."
+        speak(text: script)
     }
     
     public func stopSpeaking() {
@@ -148,9 +195,9 @@ public final class WorkoutAudioCoachService: NSObject, AVSpeechSynthesizerDelega
     // MARK: - Animated Wave Meter
     private func startWaveAnimation() {
         waveTimer?.invalidate()
-        waveTimer = Timer.scheduledTimer(withTimeInterval: 0.12, repeats: true) { [weak self] _ in
+        waveTimer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { [weak self] _ in
             guard let self = self, self.isSpeaking else { return }
-            self.audioWaveLevel = CGFloat.random(in: 0.3...1.0)
+            self.audioWaveLevel = CGFloat.random(in: 0.35...1.0)
         }
     }
     
