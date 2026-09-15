@@ -10,6 +10,7 @@ public struct DashboardView: View {
     @Query(sort: \DailyDisciplineEntry.date, order: .reverse) private var disciplineEntries: [DailyDisciplineEntry]
     @Query private var supplements: [SupplementItem]
     @Query(sort: \DailyMealLog.date, order: .reverse) private var todayMeals: [DailyMealLog]
+    @Query(sort: \SavedFavoriteMeal.useCount, order: .reverse) private var savedStaples: [SavedFavoriteMeal]
     
     private var profile: UserProfile? { profiles.first }
     
@@ -32,11 +33,15 @@ public struct DashboardView: View {
             .reduce(0) { $0 + $1.calories }
     }
     
+    @State private var showingEditProfileSheet = false
+    @State private var showingSmartScanSheet = false
+    @State private var quickLogToast: String?
+    
     public init() {}
     
     public var body: some View {
         NavigationStack {
-            ScrollView {
+            ScrollView(.vertical, showsIndicators: false) {
                 VStack(spacing: 20) {
                     // Header with Discipline Score Ring
                     headerScoreSection
@@ -56,19 +61,63 @@ public struct DashboardView: View {
                     // Today's Supplement Protocol
                     supplementProtocolSection
                 }
+                .frame(maxWidth: .infinity)
                 .padding(.horizontal, 20)
                 .padding(.vertical, 16)
             }
+            .scrollBounceBehavior(.basedOnSize, axes: .horizontal)
             .ascendBackground()
             .navigationTitle("Ascend")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     if let profile = profile {
-                        Label(profile.goal.rawValue, systemImage: profile.goal.badge)
+                        Button {
+                            showingEditProfileSheet = true
+                        } label: {
+                            HStack(spacing: 5) {
+                                Image(systemName: "slider.horizontal.3")
+                                Text("Edit Profile")
+                            }
                             .font(.caption.bold())
-                            .foregroundStyle(AscendTheme.emerald)
+                            .foregroundStyle(AscendTheme.bgPrimary)
+                            .padding(.horizontal, 10)
+                            .padding(.vertical, 5)
+                            .background(AscendTheme.emerald)
+                            .clipShape(Capsule())
+                        }
                     }
+                }
+            }
+            .sheet(isPresented: $showingEditProfileSheet) {
+                if let profile = profile {
+                    OnboardingFlowView(profile: profile, isEditing: true)
+                }
+            }
+            .sheet(isPresented: $showingSmartScanSheet) {
+                SmartMealScannerView()
+            }
+            .overlay(alignment: .top) {
+                if let toast = quickLogToast {
+                    HStack(spacing: 8) {
+                        Image(systemName: "checkmark.circle.fill")
+                            .foregroundStyle(AscendTheme.emerald)
+                        Text(toast)
+                            .font(.caption.bold())
+                            .foregroundStyle(AscendTheme.textPrimary)
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 10)
+                    .background(.ultraThinMaterial)
+                    .clipShape(Capsule())
+                    .overlay(
+                        Capsule()
+                            .stroke(AscendTheme.cardBorder, lineWidth: 1)
+                    )
+                    .shadow(color: .black.opacity(0.3), radius: 10, y: 4)
+                    .padding(.top, 8)
+                    .transition(.move(edge: .top).combined(with: .opacity))
+                    .zIndex(100)
                 }
             }
         }
@@ -312,6 +361,7 @@ public struct DashboardView: View {
                                 }
                             }
                         }
+                        .scrollBounceBehavior(.basedOnSize, axes: .horizontal)
                         
                         Button {
                             appState.startWorkout(routine: primaryRoutine, day: firstDay)
@@ -348,7 +398,19 @@ public struct DashboardView: View {
                 
                 Spacer()
                 
-                Button("Log Meal") {
+                Button {
+                    showingSmartScanSheet = true
+                } label: {
+                    HStack(spacing: 4) {
+                        Image(systemName: "camera.viewfinder")
+                        Text("Scan")
+                    }
+                    .font(.caption.bold())
+                    .foregroundStyle(AscendTheme.emerald)
+                }
+                .padding(.trailing, 8)
+                
+                Button("Portions") {
                     appState.selectedTab = 2 // Go to nutrition tab
                 }
                 .font(.caption.bold())
@@ -356,50 +418,135 @@ public struct DashboardView: View {
             }
             
             GlassCard(cornerRadius: 18, padding: 16) {
-                HStack(spacing: 20) {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("Calories")
-                            .font(.caption)
-                            .foregroundStyle(AscendTheme.textSecondary)
-                        HStack(alignment: .firstTextBaseline, spacing: 2) {
-                            Text("\(totalCaloriesConsumedToday)")
-                                .font(.title2.bold())
-                                .monospacedDigit()
-                                .foregroundStyle(AscendTheme.textPrimary)
-                            Text("/ \(profile?.dailyCalorieTarget ?? 2400)")
+                VStack(spacing: 14) {
+                    HStack(spacing: 20) {
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text("Calories")
                                 .font(.caption)
-                                .foregroundStyle(AscendTheme.textMuted)
+                                .foregroundStyle(AscendTheme.textSecondary)
+                            HStack(alignment: .firstTextBaseline, spacing: 2) {
+                                Text("\(totalCaloriesConsumedToday)")
+                                    .font(.title2.bold())
+                                    .monospacedDigit()
+                                    .foregroundStyle(AscendTheme.textPrimary)
+                                Text("/ \(profile?.dailyCalorieTarget ?? 2400)")
+                                    .font(.caption)
+                                    .foregroundStyle(AscendTheme.textMuted)
+                            }
+                            
+                            ProgressView(
+                                value: Double(totalCaloriesConsumedToday),
+                                total: Double(profile?.dailyCalorieTarget ?? 2400)
+                            )
+                            .tint(AscendTheme.emerald)
                         }
                         
-                        ProgressView(
-                            value: Double(totalCaloriesConsumedToday),
-                            total: Double(profile?.dailyCalorieTarget ?? 2400)
-                        )
-                        .tint(AscendTheme.emerald)
-                    }
-                    
-                    Divider().frame(height: 45)
-                    
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("Protein Target")
-                            .font(.caption)
-                            .foregroundStyle(AscendTheme.textSecondary)
-                        HStack(alignment: .firstTextBaseline, spacing: 2) {
-                            Text("\(Int(totalProteinConsumedToday))g")
-                                .font(.title2.bold())
-                                .monospacedDigit()
-                                .foregroundStyle(AscendTheme.cyan)
-                            Text("/ \(profile?.dailyProteinGrams ?? 165)g")
-                                .font(.caption)
-                                .foregroundStyle(AscendTheme.textMuted)
-                        }
+                        Divider().frame(height: 45)
                         
-                        ProgressView(
-                            value: totalProteinConsumedToday,
-                            total: Double(profile?.dailyProteinGrams ?? 165)
-                        )
-                        .tint(AscendTheme.cyan)
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text("Protein Target")
+                                .font(.caption)
+                                .foregroundStyle(AscendTheme.textSecondary)
+                            HStack(alignment: .firstTextBaseline, spacing: 2) {
+                                Text("\(Int(totalProteinConsumedToday))g")
+                                    .font(.title2.bold())
+                                    .monospacedDigit()
+                                    .foregroundStyle(AscendTheme.cyan)
+                                Text("/ \(profile?.dailyProteinGrams ?? 165)g")
+                                    .font(.caption)
+                                    .foregroundStyle(AscendTheme.textMuted)
+                            }
+                            
+                            ProgressView(
+                                value: totalProteinConsumedToday,
+                                total: Double(profile?.dailyProteinGrams ?? 165)
+                            )
+                            .tint(AscendTheme.cyan)
+                        }
                     }
+                    
+                    // 1-Tap Quick Staples Bar
+                    if !savedStaples.isEmpty {
+                        Divider().padding(.vertical, 2)
+                        
+                        VStack(alignment: .leading, spacing: 8) {
+                            HStack {
+                                Text("1-TAP QUICK STAPLES")
+                                    .font(.system(size: 10, weight: .bold))
+                                    .foregroundStyle(AscendTheme.amber)
+                                    .tracking(1)
+                                Spacer()
+                                Text("Tap to log")
+                                    .font(.system(size: 10))
+                                    .foregroundStyle(AscendTheme.textMuted)
+                            }
+                            
+                            ScrollView(.horizontal, showsIndicators: false) {
+                                HStack(spacing: 8) {
+                                    ForEach(savedStaples.prefix(6)) { staple in
+                                        Button {
+                                            logStapleFromDashboard(staple)
+                                        } label: {
+                                            HStack(spacing: 6) {
+                                                Image(systemName: staple.safeIcon)
+                                                    .font(.caption2)
+                                                    .foregroundStyle(AscendTheme.emerald)
+                                                Text(staple.name)
+                                                    .font(.caption2.bold())
+                                                    .foregroundStyle(AscendTheme.textPrimary)
+                                                Text("+\(staple.calories)")
+                                                    .font(.system(size: 9, weight: .bold))
+                                                    .foregroundStyle(AscendTheme.emerald)
+                                                    .padding(.horizontal, 4)
+                                                    .padding(.vertical, 2)
+                                                    .background(AscendTheme.emerald.opacity(0.15))
+                                                    .clipShape(Capsule())
+                                            }
+                                            .padding(.horizontal, 10)
+                                            .padding(.vertical, 6)
+                                            .background(AscendTheme.bgSecondary)
+                                            .clipShape(Capsule())
+                                            .overlay(
+                                                Capsule()
+                                                    .stroke(AscendTheme.cardBorder, lineWidth: 1)
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+                            .scrollBounceBehavior(.basedOnSize, axes: .horizontal)
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    private func logStapleFromDashboard(_ staple: SavedFavoriteMeal) {
+        let log = DailyMealLog(
+            mealSlot: staple.mealSlot,
+            foodName: staple.name,
+            servings: 1.0,
+            proteinGrams: staple.proteinGrams,
+            carbsGrams: staple.carbsGrams,
+            fatsGrams: staple.fatsGrams,
+            calories: staple.calories,
+            isSmartScanned: false,
+            portionNotes: staple.servingDescription
+        )
+        modelContext.insert(log)
+        staple.useCount += 1
+        staple.lastLoggedAt = Date()
+        try? modelContext.save()
+        
+        UINotificationFeedbackGenerator().notificationOccurred(.success)
+        withAnimation(.snappy) {
+            quickLogToast = "Logged \(staple.name) (+\(staple.calories) kcal)"
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
+            withAnimation {
+                if quickLogToast == "Logged \(staple.name) (+\(staple.calories) kcal)" {
+                    quickLogToast = nil
                 }
             }
         }

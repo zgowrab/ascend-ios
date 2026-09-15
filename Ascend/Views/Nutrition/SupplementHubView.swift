@@ -16,79 +16,88 @@ public struct SupplementHubView: View {
     
     public var body: some View {
         NavigationStack {
-            ScrollView {
-                VStack(spacing: 20) {
-                    // Header Guidance Card
-                    GlassCard(cornerRadius: 20, padding: 18) {
-                        VStack(alignment: .leading, spacing: 6) {
-                            Text("SCIENCE-BACKED PROTOCOL")
-                                .font(.caption2.bold())
-                                .foregroundStyle(AscendTheme.amber)
-                                .tracking(1)
-                            
-                            Text("Supplement Optimization")
-                                .font(.title3.bold())
-                                .foregroundStyle(AscendTheme.textPrimary)
-                            
-                            Text("Supplements yield the final 5-10% edge when whole nutrition and heavy resistance training are locked in. Timing maximizes bioavailability.")
-                                .font(.caption)
-                                .foregroundStyle(AscendTheme.textSecondary)
+            GeometryReader { geo in
+                ScrollView(.vertical, showsIndicators: false) {
+                    VStack(spacing: 20) {
+                        // Header Guidance Card
+                        GlassCard(cornerRadius: 20, padding: 18) {
+                            VStack(alignment: .leading, spacing: 6) {
+                                Text("SCIENCE-BACKED PROTOCOL")
+                                    .font(.caption2.bold())
+                                    .foregroundStyle(AscendTheme.amber)
+                                    .tracking(1)
+                                
+                                Text("Supplement Optimization")
+                                    .font(.title3.bold())
+                                    .foregroundStyle(AscendTheme.textPrimary)
+                                
+                                Text("Supplements yield the final 5-10% edge when whole nutrition and heavy resistance training are locked in. Timing maximizes bioavailability.")
+                                    .font(.caption)
+                                    .foregroundStyle(AscendTheme.textSecondary)
+                            }
+                            .frame(maxWidth: .infinity, alignment: .leading)
                         }
-                    }
-                    
-                    // Daily Timing Checklist
-                    VStack(alignment: .leading, spacing: 12) {
-                        Label("Daily Timing Schedule", systemImage: "clock.fill")
-                            .font(.headline)
-                            .foregroundStyle(AscendTheme.emerald)
                         
-                        ForEach(SupplementTiming.allCases) { timing in
-                            let items = supplements.filter { $0.timing == timing }
-                            if !items.isEmpty {
-                                timingSection(timing: timing, items: items)
+                        // Daily Timing Checklist
+                        VStack(alignment: .leading, spacing: 12) {
+                            Label("Daily Timing Schedule", systemImage: "clock.fill")
+                                .font(.headline)
+                                .foregroundStyle(AscendTheme.emerald)
+                            
+                            ForEach(SupplementTiming.allCases) { timing in
+                                let items = supplements.filter { $0.timing == timing }
+                                if !items.isEmpty {
+                                    timingSection(timing: timing, items: items)
+                                }
                             }
                         }
-                    }
-                    
-                    // In-depth Rationale / Science Section
-                    VStack(alignment: .leading, spacing: 12) {
-                        Label("Biochemical Rationale", systemImage: "atom")
-                            .font(.headline)
-                            .foregroundStyle(AscendTheme.cyan)
                         
-                        ForEach(supplements) { supp in
-                            GlassCard(cornerRadius: 16, padding: 14) {
-                                VStack(alignment: .leading, spacing: 6) {
-                                    HStack {
-                                        Text(supp.name)
-                                            .font(.subheadline.bold())
-                                            .foregroundStyle(AscendTheme.textPrimary)
+                        // In-depth Rationale / Science Section
+                        VStack(alignment: .leading, spacing: 12) {
+                            Label("Biochemical Rationale", systemImage: "atom")
+                                .font(.headline)
+                                .foregroundStyle(AscendTheme.cyan)
+                            
+                            ForEach(supplements) { supp in
+                                GlassCard(cornerRadius: 16, padding: 14) {
+                                    VStack(alignment: .leading, spacing: 6) {
+                                        HStack {
+                                            Text(supp.name)
+                                                .font(.subheadline.bold())
+                                                .foregroundStyle(AscendTheme.textPrimary)
+                                                .lineLimit(1)
+                                            
+                                            Spacer()
+                                            
+                                            Text(supp.dosage)
+                                                .font(.caption2.bold())
+                                                .foregroundStyle(AscendTheme.emerald)
+                                                .padding(.horizontal, 8)
+                                                .padding(.vertical, 3)
+                                                .background(AscendTheme.emerald.opacity(0.15))
+                                                .clipShape(Capsule())
+                                                .lineLimit(1)
+                                        }
                                         
-                                        Spacer()
+                                        Text("Purpose: \(supp.purpose)")
+                                            .font(.caption.bold())
+                                            .foregroundStyle(AscendTheme.cyan)
+                                            .lineLimit(2)
                                         
-                                        Text(supp.dosage)
-                                            .font(.caption2.bold())
-                                            .foregroundStyle(AscendTheme.emerald)
-                                            .padding(.horizontal, 8)
-                                            .padding(.vertical, 3)
-                                            .background(AscendTheme.emerald.opacity(0.15))
-                                            .clipShape(Capsule())
+                                        Text(supp.whyItMatters)
+                                            .font(.caption)
+                                            .foregroundStyle(AscendTheme.textSecondary)
                                     }
-                                    
-                                    Text("Purpose: \(supp.purpose)")
-                                        .font(.caption.bold())
-                                        .foregroundStyle(AscendTheme.cyan)
-                                    
-                                    Text(supp.whyItMatters)
-                                        .font(.caption)
-                                        .foregroundStyle(AscendTheme.textSecondary)
+                                    .frame(maxWidth: .infinity, alignment: .leading)
                                 }
                             }
                         }
                     }
+                    .padding(.horizontal, 20)
+                    .padding(.vertical, 16)
+                    .frame(width: geo.size.width)
                 }
-                .padding(.horizontal, 20)
-                .padding(.vertical, 16)
+                .scrollBounceBehavior(.basedOnSize, axes: .horizontal)
             }
             .ascendBackground()
             .navigationTitle("Supplements")
@@ -129,10 +138,13 @@ public struct SupplementHubView: View {
                             Text(supp.name)
                                 .font(.subheadline.bold())
                                 .foregroundStyle(AscendTheme.textPrimary)
+                                .lineLimit(1)
                             Text("\(supp.dosage) • \(supp.purpose)")
                                 .font(.caption2)
                                 .foregroundStyle(AscendTheme.textSecondary)
+                                .lineLimit(2)
                         }
+                        .frame(maxWidth: .infinity, alignment: .leading)
                         
                         Spacer()
                         

@@ -13,6 +13,7 @@ public struct ActiveWorkoutPlayerView: View {
     @State private var selectedGuideExercise: ExerciseDefinition?
     @State private var showingFinishConfirmation = false
     @State private var showingCelebrationSheet = false
+    @State private var showingFormPreview: Bool = false
     
     public init() {}
     
@@ -60,35 +61,39 @@ public struct ActiveWorkoutPlayerView: View {
                     exerciseSelectorBar
                     
                     // Main Exercise Workspace
-                    ScrollView {
-                        VStack(spacing: 20) {
-                            // Exercise Info & Guide Card
-                            exerciseHeaderCard
-                            
-                            // Sets Table
-                            setsTableCard
-                            
-                            // Rest Timer Card if active
-                            if appState.isRestTimerActive {
-                                RestTimerView(
-                                    totalSeconds: Bindable(appState).restTimerTotalSeconds,
-                                    remainingSeconds: Bindable(appState).restTimerRemainingSeconds,
-                                    isRunning: Bindable(appState).isRestTimerRunning,
-                                    onComplete: {
-                                        appState.dismissRestTimer()
-                                    },
-                                    onDismiss: {
-                                        appState.dismissRestTimer()
-                                    }
-                                )
-                                .transition(.move(edge: .bottom).combined(with: .opacity))
+                    GeometryReader { geo in
+                        ScrollView(.vertical, showsIndicators: false) {
+                            VStack(spacing: 20) {
+                                // Exercise Info & Guide Card
+                                exerciseHeaderCard
+                                
+                                // Sets Table
+                                setsTableCard
+                                
+                                // Rest Timer Card if active
+                                if appState.isRestTimerActive {
+                                    RestTimerView(
+                                        totalSeconds: Bindable(appState).restTimerTotalSeconds,
+                                        remainingSeconds: Bindable(appState).restTimerRemainingSeconds,
+                                        isRunning: Bindable(appState).isRestTimerRunning,
+                                        onComplete: {
+                                            appState.dismissRestTimer()
+                                        },
+                                        onDismiss: {
+                                            appState.dismissRestTimer()
+                                        }
+                                    )
+                                    .transition(.move(edge: .bottom).combined(with: .opacity))
+                                }
+                                
+                                // Bottom Action: Finish Workout
+                                finishButton
                             }
-                            
-                            // Bottom Action: Finish Workout
-                            finishButton
+                            .padding(.horizontal, 20)
+                            .padding(.vertical, 16)
+                            .frame(width: geo.size.width)
                         }
-                        .padding(.horizontal, 20)
-                        .padding(.vertical, 16)
+                        .scrollBounceBehavior(.basedOnSize, axes: .horizontal)
                     }
                 }
             }
@@ -201,7 +206,7 @@ public struct ActiveWorkoutPlayerView: View {
     
     private var exerciseHeaderCard: some View {
         GlassCard(cornerRadius: 18, padding: 16) {
-            VStack(alignment: .leading, spacing: 10) {
+            VStack(alignment: .leading, spacing: 12) {
                 HStack {
                     VStack(alignment: .leading, spacing: 2) {
                         Text("EXERCISE \(selectedExerciseIndex + 1) OF \(distinctExerciseNames.count)")
@@ -212,38 +217,79 @@ public struct ActiveWorkoutPlayerView: View {
                         Text(currentExerciseName)
                             .font(.title3.bold())
                             .foregroundStyle(AscendTheme.textPrimary)
+                            .lineLimit(1)
                     }
                     
                     Spacer()
                     
+                    // Detail Form Guide
                     Button {
                         if let def = matchingDefinition {
                             selectedGuideExercise = def
                         }
                     } label: {
-                        Label("Form Guide", systemImage: "info.circle.fill")
+                        Label("Guide", systemImage: "info.circle.fill")
                             .font(.caption.bold())
-                            .foregroundStyle(AscendTheme.cyan)
+                            .foregroundStyle(AscendTheme.emerald)
                             .padding(.horizontal, 10)
                             .padding(.vertical, 6)
-                            .background(AscendTheme.cyan.opacity(0.15))
+                            .background(AscendTheme.emerald.opacity(0.15))
                             .clipShape(Capsule())
                     }
                 }
                 
                 if let def = matchingDefinition {
+                    let profile = MuscleActivationProfile.profile(for: def.name, muscleGroup: def.muscleGroup)
+                    
                     HStack(spacing: 8) {
-                        Label(def.muscleGroup.rawValue, systemImage: def.muscleGroup.icon)
-                            .font(.caption2)
-                            .foregroundStyle(AscendTheme.textSecondary)
-                        Text("•")
-                            .foregroundStyle(AscendTheme.textMuted)
-                        Label(def.equipment.rawValue, systemImage: "wrench.fill")
-                            .font(.caption2)
-                            .foregroundStyle(AscendTheme.textSecondary)
+                        // Toggle for inline movement animation
+                        Button {
+                            withAnimation(.spring(response: 0.35, dampingFraction: 0.8)) {
+                                showingFormPreview.toggle()
+                            }
+                        } label: {
+                            HStack(spacing: 4) {
+                                Image(systemName: showingFormPreview ? "chevron.up.circle.fill" : "play.circle.fill")
+                                Text(showingFormPreview ? "Hide Motion" : "Show Motion")
+                            }
+                            .font(.caption2.bold())
+                            .foregroundStyle(AscendTheme.textPrimary)
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 4)
+                            .background(AscendTheme.bgElevated)
+                            .clipShape(Capsule())
+                        }
+                        
+                        // Primary Target Muscle Badge
+                        HStack(spacing: 4) {
+                            Circle()
+                                .fill(AscendTheme.emerald)
+                                .frame(width: 6, height: 6)
+                            Text(profile.primaryMuscles.first ?? def.muscleGroup.rawValue)
+                                .font(.caption2.bold())
+                                .foregroundStyle(AscendTheme.emerald)
+                                .lineLimit(1)
+                        }
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 4)
+                        .background(AscendTheme.emerald.opacity(0.12))
+                        .clipShape(Capsule())
+                        
+                        Spacer()
+                    }
+                    
+                    // Inline Collapsible Kinematic Animation
+                    if showingFormPreview {
+                        ExerciseKinematicAnimationView(
+                            exerciseName: def.name,
+                            muscleGroup: def.muscleGroup,
+                            height: 170
+                        )
+                        .transition(.opacity.combined(with: .scale(scale: 0.96)))
                     }
                 }
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
         }
     }
     

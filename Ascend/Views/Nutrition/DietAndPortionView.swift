@@ -7,12 +7,16 @@ public struct DietAndPortionView: View {
     @Query private var profiles: [UserProfile]
     @Query(sort: \FoodItem.name) private var foodItems: [FoodItem]
     @Query(sort: \DailyMealLog.date, order: .reverse) private var mealLogs: [DailyMealLog]
+    @Query(sort: \SavedFavoriteMeal.useCount, order: .reverse) private var savedStaples: [SavedFavoriteMeal]
     
     @State private var selectedFoodCategory: FoodCategory = .protein
     @State private var showingAddMealSheet = false
+    @State private var showingSmartScanSheet = false
+    @State private var showingManageStaplesSheet = false
     @State private var selectedFoodToLog: FoodItem?
     @State private var logMealSlot: String = "Lunch"
     @State private var logServings: Double = 1.0
+    @State private var quickLogToastMessage: String?
     
     private var profile: UserProfile? { profiles.first }
     
@@ -41,28 +45,87 @@ public struct DietAndPortionView: View {
     
     public var body: some View {
         NavigationStack {
-            ScrollView {
-                VStack(spacing: 20) {
-                    // Macro Progress Ring & Numbers
-                    macroHeroCard
-                    
-                    // Hand-Based Visual Portion Guide
-                    handPortionGuideSection
-                    
-                    // Food Suggestions & Staple Library
-                    foodSuggestionsSection
-                    
-                    // Today's Logged Meals
-                    todayLoggedMealsSection
+            ZStack(alignment: .top) {
+                GeometryReader { geo in
+                    ScrollView(.vertical, showsIndicators: false) {
+                        VStack(spacing: 20) {
+                            // Macro Progress Ring & Numbers
+                            macroHeroCard
+                            
+                            // Smart Photo Scanner Action Banner
+                            smartScanBanner
+                            
+                            // Daily Recurring Staples (1-Tap Log)
+                            quickStaplesSection
+                            
+                            // Hand-Based Visual Portion Guide
+                            handPortionGuideSection
+                            
+                            // Food Suggestions & Staple Library
+                            foodSuggestionsSection
+                            
+                            // Today's Logged Meals
+                            todayLoggedMealsSection
+                        }
+                        .padding(.horizontal, 20)
+                        .padding(.vertical, 16)
+                        .frame(width: geo.size.width)
+                    }
+                    .scrollBounceBehavior(.basedOnSize, axes: .horizontal)
                 }
-                .padding(.horizontal, 20)
-                .padding(.vertical, 16)
+                
+                // Toast notification on 1-tap quick log
+                if let toast = quickLogToastMessage {
+                    HStack(spacing: 8) {
+                        Image(systemName: "checkmark.circle.fill")
+                            .foregroundStyle(AscendTheme.emerald)
+                        Text(toast)
+                            .font(.caption.bold())
+                            .foregroundStyle(AscendTheme.textPrimary)
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 10)
+                    .background(.ultraThinMaterial)
+                    .clipShape(Capsule())
+                    .overlay(
+                        Capsule()
+                            .stroke(AscendTheme.cardBorder, lineWidth: 1)
+                    )
+                    .shadow(color: .black.opacity(0.3), radius: 10, y: 4)
+                    .padding(.top, 10)
+                    .transition(.move(edge: .top).combined(with: .opacity))
+                    .zIndex(100)
+                }
             }
             .ascendBackground()
             .navigationTitle("Nutrition & Portions")
             .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
+                        showingSmartScanSheet = true
+                    } label: {
+                        HStack(spacing: 4) {
+                            Image(systemName: "camera.viewfinder")
+                            Text("Scan")
+                        }
+                        .font(.caption.bold())
+                        .foregroundStyle(AscendTheme.bgPrimary)
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 5)
+                        .background(AscendTheme.emerald)
+                        .clipShape(Capsule())
+                    }
+                }
+            }
             .sheet(item: $selectedFoodToLog) { food in
                 logFoodSheet(for: food)
+            }
+            .sheet(isPresented: $showingSmartScanSheet) {
+                SmartMealScannerView()
+            }
+            .sheet(isPresented: $showingManageStaplesSheet) {
+                QuickStaplesManagerView()
             }
         }
     }
@@ -95,7 +158,7 @@ public struct DietAndPortionView: View {
                 }
                 
                 // Big 4 Macro Meters
-                HStack(spacing: 12) {
+                HStack(spacing: 8) {
                     macroMeter(
                         title: "Calories",
                         current: Double(totalCaloriesToday),
@@ -140,36 +203,33 @@ public struct DietAndPortionView: View {
         color: Color
     ) -> some View {
         let progress = target > 0 ? min(1.0, current / target) : 0
-        return VStack(spacing: 6) {
+        return VStack(spacing: 4) {
             Text(title)
-                .font(.caption2)
+                .font(.system(size: 10, weight: .medium))
                 .foregroundStyle(AscendTheme.textSecondary)
+                .lineLimit(1)
             
             Text("\(Int(current))")
                 .font(.system(.subheadline, design: .rounded).bold())
                 .monospacedDigit()
                 .foregroundStyle(AscendTheme.textPrimary)
+                .lineLimit(1)
+                .minimumScaleFactor(0.8)
             
             Text("/ \(Int(target))\(unit)")
-                .font(.system(size: 9))
+                .font(.system(size: 8))
                 .foregroundStyle(AscendTheme.textMuted)
+                .lineLimit(1)
+                .minimumScaleFactor(0.75)
             
             // Mini progress bar
-            GeometryReader { geo in
-                ZStack(alignment: .leading) {
-                    Capsule()
-                        .fill(Color.white.opacity(0.08))
-                        .frame(height: 4)
-                    Capsule()
-                        .fill(color)
-                        .frame(width: geo.size.width * CGFloat(progress), height: 4)
-                }
-            }
-            .frame(height: 4)
+            ProgressView(value: progress, total: 1.0)
+                .tint(color)
+                .frame(height: 4)
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, 8)
-        .padding(.horizontal, 6)
+        .padding(.horizontal, 4)
         .background(AscendTheme.bgElevated)
         .clipShape(RoundedRectangle(cornerRadius: 12))
     }
@@ -220,6 +280,7 @@ public struct DietAndPortionView: View {
                     )
                 }
             }
+            .scrollBounceBehavior(.basedOnSize, axes: .horizontal)
         }
     }
     
@@ -268,24 +329,27 @@ public struct DietAndPortionView: View {
                 .foregroundStyle(AscendTheme.cyan)
             
             // Category selector
-            HStack(spacing: 8) {
-                ForEach(FoodCategory.allCases) { cat in
-                    Button {
-                        selectedFoodCategory = cat
-                    } label: {
-                        HStack(spacing: 4) {
-                            Image(systemName: cat.icon)
-                            Text(cat.rawValue)
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 8) {
+                    ForEach(FoodCategory.allCases) { cat in
+                        Button {
+                            selectedFoodCategory = cat
+                        } label: {
+                            HStack(spacing: 4) {
+                                Image(systemName: cat.icon)
+                                Text(cat.rawValue)
+                            }
+                            .font(.caption.bold())
+                            .padding(.horizontal, 10)
+                            .padding(.vertical, 6)
+                            .background(selectedFoodCategory == cat ? AscendTheme.cyan : AscendTheme.bgElevated)
+                            .foregroundStyle(selectedFoodCategory == cat ? AscendTheme.bgPrimary : AscendTheme.textSecondary)
+                            .clipShape(Capsule())
                         }
-                        .font(.caption.bold())
-                        .padding(.horizontal, 10)
-                        .padding(.vertical, 6)
-                        .background(selectedFoodCategory == cat ? AscendTheme.cyan : AscendTheme.bgElevated)
-                        .foregroundStyle(selectedFoodCategory == cat ? AscendTheme.bgPrimary : AscendTheme.textSecondary)
-                        .clipShape(Capsule())
                     }
                 }
             }
+            .scrollBounceBehavior(.basedOnSize, axes: .horizontal)
             
             // Food items in category
             let filteredFoods = foodItems.filter { $0.category == selectedFoodCategory }
@@ -297,6 +361,7 @@ public struct DietAndPortionView: View {
                                 Text(food.name)
                                     .font(.subheadline.bold())
                                     .foregroundStyle(AscendTheme.textPrimary)
+                                    .lineLimit(1)
                                 
                                 if food.isBudgetStaple {
                                     Text("BUDGET STAPLE")
@@ -329,6 +394,7 @@ public struct DietAndPortionView: View {
                                     .foregroundStyle(AscendTheme.textMuted)
                             }
                         }
+                        .frame(maxWidth: .infinity, alignment: .leading)
                         
                         Spacer()
                         
@@ -343,6 +409,185 @@ public struct DietAndPortionView: View {
                     .padding(12)
                     .background(AscendTheme.bgSecondary)
                     .clipShape(RoundedRectangle(cornerRadius: 14))
+                }
+            }
+        }
+    }
+    
+    // MARK: - Smart Photo Scan Banner
+    private var smartScanBanner: some View {
+        Button {
+            showingSmartScanSheet = true
+        } label: {
+            GlassCard(cornerRadius: 18, padding: 14) {
+                HStack(spacing: 14) {
+                    ZStack {
+                        Circle()
+                            .fill(AscendTheme.emerald.opacity(0.18))
+                            .frame(width: 44, height: 44)
+                        Image(systemName: "camera.viewfinder")
+                            .font(.title3.bold())
+                            .foregroundStyle(AscendTheme.emerald)
+                    }
+                    
+                    VStack(alignment: .leading, spacing: 3) {
+                        HStack(spacing: 6) {
+                            Text("Smart Photo Scan")
+                                .font(.headline.bold())
+                                .foregroundStyle(AscendTheme.textPrimary)
+                            
+                            Text("AI VISION")
+                                .font(.system(size: 8, weight: .black))
+                                .foregroundStyle(AscendTheme.bgPrimary)
+                                .padding(.horizontal, 6)
+                                .padding(.vertical, 2)
+                                .background(AscendTheme.emerald)
+                                .clipShape(Capsule())
+                        }
+                        
+                        Text("Snap meal photo • Auto-compressed • Calorie & macro prediction")
+                            .font(.caption2)
+                            .foregroundStyle(AscendTheme.textSecondary)
+                            .lineLimit(2)
+                            .multilineTextAlignment(.leading)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    
+                    Image(systemName: "chevron.right")
+                        .font(.caption.bold())
+                        .foregroundStyle(AscendTheme.textMuted)
+                }
+            }
+        }
+    }
+    
+    // MARK: - Daily Recurring Staples (1-Tap Log)
+    private var quickStaplesSection: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack {
+                Label("Daily Recurring Staples", systemImage: "star.fill")
+                    .font(.headline)
+                    .foregroundStyle(AscendTheme.amber)
+                
+                Spacer()
+                
+                Button {
+                    showingManageStaplesSheet = true
+                } label: {
+                    HStack(spacing: 4) {
+                        Image(systemName: "slider.horizontal.3")
+                        Text("Manage")
+                    }
+                    .font(.caption.bold())
+                    .foregroundStyle(AscendTheme.cyan)
+                }
+            }
+            
+            if savedStaples.isEmpty {
+                GlassCard(cornerRadius: 14, padding: 12) {
+                    HStack(spacing: 8) {
+                        Image(systemName: "sparkles")
+                            .foregroundStyle(AscendTheme.amber)
+                        Text("Save everyday staples for 1-tap fast logging!")
+                            .font(.caption)
+                            .foregroundStyle(AscendTheme.textSecondary)
+                            .lineLimit(2)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                        Button("Add") {
+                            showingManageStaplesSheet = true
+                        }
+                        .font(.caption.bold())
+                        .foregroundStyle(AscendTheme.emerald)
+                    }
+                }
+            } else {
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 12) {
+                        ForEach(savedStaples) { staple in
+                            stapleQuickCard(staple)
+                        }
+                    }
+                    .padding(.vertical, 2)
+                }
+                .scrollBounceBehavior(.basedOnSize, axes: .horizontal)
+            }
+        }
+    }
+    
+    private func stapleQuickCard(_ staple: SavedFavoriteMeal) -> some View {
+        Button {
+            logStapleImmediately(staple)
+        } label: {
+            HStack(spacing: 12) {
+                Image(systemName: staple.safeIcon)
+                    .font(.title3)
+                    .foregroundStyle(AscendTheme.emerald)
+                    .frame(width: 38, height: 38)
+                    .background(AscendTheme.bgSecondary)
+                    .clipShape(Circle())
+                
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(staple.name)
+                        .font(.subheadline.bold())
+                        .foregroundStyle(AscendTheme.textPrimary)
+                        .lineLimit(1)
+                    
+                    HStack(spacing: 6) {
+                        Text("\(staple.calories) kcal")
+                            .font(.caption2.bold())
+                            .foregroundStyle(AscendTheme.emerald)
+                        
+                        Text("•")
+                            .font(.caption2)
+                            .foregroundStyle(AscendTheme.textMuted)
+                        
+                        Text("\(Int(staple.proteinGrams))g P")
+                            .font(.caption2)
+                            .foregroundStyle(AscendTheme.cyan)
+                    }
+                }
+                
+                Image(systemName: "plus.circle.fill")
+                    .font(.title3)
+                    .foregroundStyle(AscendTheme.emerald)
+            }
+            .padding(.horizontal, 14)
+            .padding(.vertical, 10)
+            .background(AscendTheme.bgElevated)
+            .clipShape(RoundedRectangle(cornerRadius: 14))
+            .overlay(
+                RoundedRectangle(cornerRadius: 14)
+                    .stroke(AscendTheme.cardBorder, lineWidth: 1)
+            )
+        }
+    }
+    
+    private func logStapleImmediately(_ staple: SavedFavoriteMeal) {
+        let log = DailyMealLog(
+            mealSlot: staple.mealSlot,
+            foodName: staple.name,
+            servings: 1.0,
+            proteinGrams: staple.proteinGrams,
+            carbsGrams: staple.carbsGrams,
+            fatsGrams: staple.fatsGrams,
+            calories: staple.calories,
+            isSmartScanned: false,
+            portionNotes: staple.servingDescription
+        )
+        modelContext.insert(log)
+        staple.useCount += 1
+        staple.lastLoggedAt = Date()
+        try? modelContext.save()
+        
+        // Haptic feedback & feedback toast
+        UINotificationFeedbackGenerator().notificationOccurred(.success)
+        withAnimation(.snappy) {
+            quickLogToastMessage = "Logged \(staple.name) (+\(staple.calories) kcal)"
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
+            withAnimation {
+                if quickLogToastMessage == "Logged \(staple.name) (+\(staple.calories) kcal)" {
+                    quickLogToastMessage = nil
                 }
             }
         }
@@ -364,34 +609,70 @@ public struct DietAndPortionView: View {
             }
             
             if todayMealLogs.isEmpty {
-                Text("No meals logged yet today. Tap + on any food above to log your portions.")
+                Text("No meals logged yet today. Tap + on any food above, scan a meal photo, or tap a staple to log in 1 tap.")
                     .font(.caption)
                     .foregroundStyle(AscendTheme.textMuted)
                     .padding(.vertical, 8)
             } else {
                 VStack(spacing: 8) {
                     ForEach(todayMealLogs) { meal in
-                        HStack {
+                        HStack(spacing: 12) {
+                            if let photoName = meal.photoFileName,
+                               let photo = MealImageStorageService.shared.loadMealPhoto(fileName: photoName) {
+                                Image(uiImage: photo)
+                                    .resizable()
+                                    .scaledToFill()
+                                    .frame(width: 44, height: 44)
+                                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: 8)
+                                            .stroke(AscendTheme.cardBorder, lineWidth: 1)
+                                    )
+                            } else {
+                                Image(systemName: meal.isSmartScanned ? "camera.fill" : "fork.knife")
+                                    .font(.caption)
+                                    .foregroundStyle(meal.isSmartScanned ? AscendTheme.cyan : AscendTheme.emerald)
+                                    .frame(width: 40, height: 40)
+                                    .background(AscendTheme.bgSecondary)
+                                    .clipShape(Circle())
+                            }
+                            
                             VStack(alignment: .leading, spacing: 2) {
-                                HStack {
+                                HStack(spacing: 4) {
                                     Text(meal.mealSlot)
                                         .font(.caption2.bold())
                                         .foregroundStyle(AscendTheme.emerald)
+                                    
+                                    if meal.isSmartScanned {
+                                        Text("AI SCAN")
+                                            .font(.system(size: 8, weight: .black))
+                                            .foregroundStyle(AscendTheme.cyan)
+                                            .padding(.horizontal, 4)
+                                            .padding(.vertical, 1)
+                                            .background(AscendTheme.cyan.opacity(0.15))
+                                            .clipShape(Capsule())
+                                    }
+                                    
                                     Text("•")
                                         .foregroundStyle(AscendTheme.textMuted)
                                     Text(meal.foodName)
                                         .font(.subheadline.bold())
                                         .foregroundStyle(AscendTheme.textPrimary)
+                                        .lineLimit(1)
                                 }
                                 
                                 Text("\(Int(meal.proteinGrams))g Protein • \(meal.calories) kcal")
                                     .font(.caption2)
                                     .foregroundStyle(AscendTheme.textSecondary)
                             }
+                            .frame(maxWidth: .infinity, alignment: .leading)
                             
                             Spacer()
                             
                             Button {
+                                if let photoName = meal.photoFileName {
+                                    MealImageStorageService.shared.deleteMealPhoto(fileName: photoName)
+                                }
                                 modelContext.delete(meal)
                                 try? modelContext.save()
                             } label: {
@@ -408,6 +689,7 @@ public struct DietAndPortionView: View {
             }
         }
     }
+
     
     // MARK: - Log Sheet
     private func logFoodSheet(for food: FoodItem) -> some View {

@@ -37,6 +37,8 @@ public struct AscendTheme {
         startPoint: .topLeading,
         endPoint: .bottomTrailing
     )
+    
+    public static let cardBorder = Color.white.opacity(0.12)
 }
 
 public extension View {

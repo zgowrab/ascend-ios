@@ -36,22 +36,26 @@ public struct AnalyticsView: View {
     
     public var body: some View {
         NavigationStack {
-            ScrollView {
-                VStack(spacing: 20) {
-                    // Career Stats Row
-                    careerStatsRow
-                    
-                    // Discipline Score Chart (Swift Charts)
-                    disciplineChartCard
-                    
-                    // Workout Volume Chart (Swift Charts)
-                    workoutVolumeChartCard
-                    
-                    // Milestones & Betterment Badges
-                    milestonesSection
+            GeometryReader { geo in
+                ScrollView(.vertical, showsIndicators: false) {
+                    VStack(spacing: 20) {
+                        // Career Stats Row
+                        careerStatsRow
+                        
+                        // Discipline Score Chart (Swift Charts)
+                        disciplineChartCard
+                        
+                        // Workout Volume Chart (Swift Charts)
+                        workoutVolumeChartCard
+                        
+                        // Milestones & Betterment Badges
+                        milestonesSection
+                    }
+                    .padding(.horizontal, 20)
+                    .padding(.vertical, 16)
+                    .frame(width: geo.size.width)
                 }
-                .padding(.horizontal, 20)
-                .padding(.vertical, 16)
+                .scrollBounceBehavior(.basedOnSize, axes: .horizontal)
             }
             .ascendBackground()
             .navigationTitle("Analytics & Progress")
@@ -61,7 +65,7 @@ public struct AnalyticsView: View {
     
     // MARK: - Career Stats Row
     private var careerStatsRow: some View {
-        HStack(spacing: 12) {
+        HStack(spacing: 10) {
             statCard(
                 title: "Current Streak",
                 value: "\(currentDisciplineStreak) Days",
@@ -95,22 +99,25 @@ public struct AnalyticsView: View {
         icon: String,
         color: Color
     ) -> some View {
-        VStack(alignment: .leading, spacing: 6) {
+        VStack(alignment: .leading, spacing: 4) {
             Image(systemName: icon)
-                .font(.body)
+                .font(.subheadline)
                 .foregroundStyle(color)
             
             Text(value)
-                .font(.system(.title3, design: .rounded).bold())
+                .font(.system(.headline, design: .rounded).bold())
                 .foregroundStyle(AscendTheme.textPrimary)
+                .lineLimit(1)
+                .minimumScaleFactor(0.8)
             
             Text(title)
                 .font(.caption2.bold())
                 .foregroundStyle(AscendTheme.textSecondary)
+                .lineLimit(1)
+                .minimumScaleFactor(0.75)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(14)
-        .glassCardStyle(cornerRadius: 16)
+        .glassCardStyle(cornerRadius: 14, padding: 10)
     }
     
     // MARK: - Discipline Chart
@@ -288,7 +295,7 @@ public struct AnalyticsView: View {
     }
     
     private func milestoneBadge(title: String, desc: String, isUnlocked: Bool) -> some View {
-        HStack(spacing: 14) {
+        HStack(spacing: 12) {
             Image(systemName: isUnlocked ? "checkmark.seal.fill" : "lock.fill")
                 .font(.title2)
                 .foregroundStyle(isUnlocked ? AscendTheme.amber : AscendTheme.textMuted)
@@ -297,12 +304,15 @@ public struct AnalyticsView: View {
                 Text(title)
                     .font(.subheadline.bold())
                     .foregroundStyle(isUnlocked ? AscendTheme.textPrimary : AscendTheme.textMuted)
+                    .lineLimit(1)
                 Text(desc)
                     .font(.caption2)
                     .foregroundStyle(AscendTheme.textSecondary)
+                    .lineLimit(2)
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
             
-            Spacer()
+            Spacer(minLength: 0)
         }
         .padding(12)
         .background(AscendTheme.bgSecondary)

@@ -29,9 +29,12 @@ public struct OnboardingFlowView: View {
     @State private var selectedCarb: CarbStaple = .rice
     @State private var selectedProtein: ProteinPreference = .chickenAndEggs
     @State private var selectedDietStyle: DietStyle = .omnivore
+    @Environment(\.dismiss) private var dismiss
+    public var isEditing: Bool = false
     
-    public init(profile: UserProfile) {
+    public init(profile: UserProfile, isEditing: Bool = false) {
         self.profile = profile
+        self.isEditing = isEditing
     }
     
     public var body: some View {
@@ -91,7 +94,7 @@ public struct OnboardingFlowView: View {
                                 completeOnboarding()
                             } label: {
                                 HStack {
-                                    Text("Commit & Begin Ascension")
+                                    Text(isEditing ? "Save & Recalibrate Directive" : "Commit & Begin Ascension")
                                     Image(systemName: "arrow.right")
                                 }
                                 .font(.headline.bold())
@@ -120,6 +123,17 @@ public struct OnboardingFlowView: View {
                     .padding(.horizontal, 24)
                     .padding(.bottom, 20)
                     .background(.ultraThinMaterial)
+                }
+            }
+            .toolbar {
+                if isEditing {
+                    ToolbarItem(placement: .topBarLeading) {
+                        Button("Cancel") {
+                            dismiss()
+                        }
+                        .font(.subheadline)
+                        .foregroundStyle(AscendTheme.textSecondary)
+                    }
                 }
             }
         }
@@ -729,7 +743,22 @@ public struct OnboardingFlowView: View {
         profile.dailyFatsGrams = plan.fatsGrams
         profile.dailyWaterTargetLiters = plan.waterLiters
         
-        // Seed database
+        if isEditing {
+            // Delete existing routines to regenerate fresh cycle matching new equipment/split
+            let routineFetch = FetchDescriptor<Routine>()
+            if let existing = try? modelContext.fetch(routineFetch) {
+                for r in existing {
+                    modelContext.delete(r)
+                }
+            }
+            let routine = RoutineGenerator.generatePersonalizedRoutine(for: profile)
+            modelContext.insert(routine)
+            try? modelContext.save()
+            dismiss()
+            return
+        }
+        
+        // Seed database (initial onboarding only)
         // 1. Exercise catalog
         for ex in RoutineGenerator.defaultExerciseCatalog() {
             modelContext.insert(ex)

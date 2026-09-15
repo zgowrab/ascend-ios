@@ -105,6 +105,9 @@ public final class DailyMealLog {
     public var carbsGrams: Double
     public var fatsGrams: Double
     public var calories: Int
+    public var photoFileName: String?
+    public var isSmartScanned: Bool
+    public var portionNotes: String?
     
     public init(
         id: UUID = UUID(),
@@ -115,7 +118,10 @@ public final class DailyMealLog {
         proteinGrams: Double,
         carbsGrams: Double,
         fatsGrams: Double,
-        calories: Int
+        calories: Int,
+        photoFileName: String? = nil,
+        isSmartScanned: Bool = false,
+        portionNotes: String? = nil
     ) {
         self.id = id
         self.date = date
@@ -126,5 +132,63 @@ public final class DailyMealLog {
         self.carbsGrams = carbsGrams * servings
         self.fatsGrams = fatsGrams * servings
         self.calories = Int(Double(calories) * servings)
+        self.photoFileName = photoFileName
+        self.isSmartScanned = isSmartScanned
+        self.portionNotes = portionNotes
     }
 }
+
+@Model
+public final class SavedFavoriteMeal {
+    public var id: UUID
+    public var name: String
+    public var mealSlot: String
+    public var calories: Int
+    public var proteinGrams: Double
+    public var carbsGrams: Double
+    public var fatsGrams: Double
+    public var servingDescription: String
+    public var icon: String
+    public var isPinned: Bool
+    public var useCount: Int
+    public var createdAt: Date
+    public var lastLoggedAt: Date?
+    
+    public init(
+        id: UUID = UUID(),
+        name: String,
+        mealSlot: String = "Breakfast",
+        calories: Int,
+        proteinGrams: Double,
+        carbsGrams: Double,
+        fatsGrams: Double,
+        servingDescription: String = "1 serving",
+        icon: String = "fork.knife",
+        isPinned: Bool = true,
+        useCount: Int = 0,
+        createdAt: Date = Date(),
+        lastLoggedAt: Date? = nil
+    ) {
+        self.id = id
+        self.name = name
+        self.mealSlot = mealSlot
+        self.calories = calories
+        self.proteinGrams = proteinGrams
+        self.carbsGrams = carbsGrams
+        self.fatsGrams = fatsGrams
+        self.servingDescription = servingDescription
+        self.icon = icon
+        self.isPinned = isPinned
+        self.useCount = useCount
+        self.createdAt = createdAt
+        self.lastLoggedAt = lastLoggedAt
+    }
+    
+    public var safeIcon: String {
+        if icon == "bowl.fill" || icon.isEmpty {
+            return "cup.and.heat.waves.fill"
+        }
+        return icon
+    }
+}
+
