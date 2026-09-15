@@ -20,17 +20,17 @@ public struct ExerciseDetailView: View {
                         
                         // Visual Presentation Mode Switcher
                         Picker("Visual Mode", selection: $selectedVisualTab) {
-                            Text("Motion Animation").tag(0)
-                            Text("Target Muscle Map").tag(1)
+                            Text("Form Photos").tag(0)
+                            Text("Target Muscles").tag(1)
                         }
                         .pickerStyle(.segmented)
                         
                         // Dynamic Visual Presentation Area
                         if selectedVisualTab == 0 {
-                            ExerciseKinematicAnimationView(
+                            ExerciseDemonstrationView(
                                 exerciseName: exercise.name,
                                 muscleGroup: exercise.muscleGroup,
-                                height: 230
+                                height: 260
                             )
                         } else {
                             TargetMuscleMapVisualizer(

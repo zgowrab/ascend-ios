@@ -242,15 +242,15 @@ public struct ActiveWorkoutPlayerView: View {
                     let profile = MuscleActivationProfile.profile(for: def.name, muscleGroup: def.muscleGroup)
                     
                     HStack(spacing: 8) {
-                        // Toggle for inline movement animation
+                        // Toggle for inline real photo demonstration
                         Button {
                             withAnimation(.spring(response: 0.35, dampingFraction: 0.8)) {
                                 showingFormPreview.toggle()
                             }
                         } label: {
                             HStack(spacing: 4) {
-                                Image(systemName: showingFormPreview ? "chevron.up.circle.fill" : "play.circle.fill")
-                                Text(showingFormPreview ? "Hide Motion" : "Show Motion")
+                                Image(systemName: showingFormPreview ? "chevron.up.circle.fill" : "photo.fill")
+                                Text(showingFormPreview ? "Hide Form" : "Show Form")
                             }
                             .font(.caption2.bold())
                             .foregroundStyle(AscendTheme.textPrimary)
@@ -278,12 +278,12 @@ public struct ActiveWorkoutPlayerView: View {
                         Spacer()
                     }
                     
-                    // Inline Collapsible Kinematic Animation
+                    // Inline Collapsible Real Human Gym Form Preview
                     if showingFormPreview {
-                        ExerciseKinematicAnimationView(
+                        ExerciseDemonstrationView(
                             exerciseName: def.name,
                             muscleGroup: def.muscleGroup,
-                            height: 170
+                            height: 200
                         )
                         .transition(.opacity.combined(with: .scale(scale: 0.96)))
                     }

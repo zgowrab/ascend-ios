@@ -35,6 +35,8 @@
 		1B000001000000000000001A /* Services/WorkoutAudioCoachService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B000001000000000000011B /* Services/WorkoutAudioCoachService.swift */; };
 		1B000001000000000000001B /* Views/Workouts/Components/ExerciseKinematicAnimationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B000001000000000000011C /* Views/Workouts/Components/ExerciseKinematicAnimationView.swift */; };
 		1B000001000000000000001C /* Views/Workouts/Components/TargetMuscleMapVisualizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B000001000000000000011D /* Views/Workouts/Components/TargetMuscleMapVisualizer.swift */; };
+		1B000001000000000000001D /* Services/ExerciseDemonstrationProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B000001000000000000011E /* Services/ExerciseDemonstrationProvider.swift */; };
+		1B000001000000000000001E /* Views/Workouts/Components/ExerciseDemonstrationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B000001000000000000011F /* Views/Workouts/Components/ExerciseDemonstrationView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -67,6 +69,8 @@
 		1B000001000000000000011B /* Services/WorkoutAudioCoachService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/WorkoutAudioCoachService.swift; sourceTree = "<group>"; };
 		1B000001000000000000011C /* Views/Workouts/Components/ExerciseKinematicAnimationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workouts/Components/ExerciseKinematicAnimationView.swift; sourceTree = "<group>"; };
 		1B000001000000000000011D /* Views/Workouts/Components/TargetMuscleMapVisualizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workouts/Components/TargetMuscleMapVisualizer.swift; sourceTree = "<group>"; };
+		1B000001000000000000011E /* Services/ExerciseDemonstrationProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/ExerciseDemonstrationProvider.swift; sourceTree = "<group>"; };
+		1B000001000000000000011F /* Views/Workouts/Components/ExerciseDemonstrationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workouts/Components/ExerciseDemonstrationView.swift; sourceTree = "<group>"; };
 		1B00000100000000000001FF /* Ascend.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Ascend.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -121,6 +125,8 @@
 				1B000001000000000000011B /* Services/WorkoutAudioCoachService.swift */,
 				1B000001000000000000011C /* Views/Workouts/Components/ExerciseKinematicAnimationView.swift */,
 				1B000001000000000000011D /* Views/Workouts/Components/TargetMuscleMapVisualizer.swift */,
+				1B000001000000000000011E /* Services/ExerciseDemonstrationProvider.swift */,
+				1B000001000000000000011F /* Views/Workouts/Components/ExerciseDemonstrationView.swift */,
 			);
 			path = Ascend;
 			sourceTree = "<group>";
@@ -229,6 +235,8 @@
 				1B000001000000000000001A /* Services/WorkoutAudioCoachService.swift in Sources */,
 				1B000001000000000000001B /* Views/Workouts/Components/ExerciseKinematicAnimationView.swift in Sources */,
 				1B000001000000000000001C /* Views/Workouts/Components/TargetMuscleMapVisualizer.swift in Sources */,
+				1B000001000000000000001D /* Services/ExerciseDemonstrationProvider.swift in Sources */,
+				1B000001000000000000001E /* Views/Workouts/Components/ExerciseDemonstrationView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
