@@ -183,5 +183,12 @@ public final class SavedFavoriteMeal {
         self.createdAt = createdAt
         self.lastLoggedAt = lastLoggedAt
     }
+    
+    public var safeIcon: String {
+        if icon == "bowl.fill" || icon.isEmpty {
+            return "cup.and.heat.waves.fill"
+        }
+        return icon
+    }
 }
 

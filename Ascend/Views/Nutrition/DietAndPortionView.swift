@@ -519,7 +519,7 @@ public struct DietAndPortionView: View {
             logStapleImmediately(staple)
         } label: {
             HStack(spacing: 12) {
-                Image(systemName: staple.icon)
+                Image(systemName: staple.safeIcon)
                     .font(.title3)
                     .foregroundStyle(AscendTheme.emerald)
                     .frame(width: 38, height: 38)

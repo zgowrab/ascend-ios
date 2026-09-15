@@ -488,7 +488,7 @@ public struct DashboardView: View {
                                             logStapleFromDashboard(staple)
                                         } label: {
                                             HStack(spacing: 6) {
-                                                Image(systemName: staple.icon)
+                                                Image(systemName: staple.safeIcon)
                                                     .font(.caption2)
                                                     .foregroundStyle(AscendTheme.emerald)
                                                 Text(staple.name)

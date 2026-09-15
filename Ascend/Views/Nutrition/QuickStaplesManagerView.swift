@@ -53,7 +53,7 @@ public struct QuickStaplesManagerView: View {
                     } else {
                         ForEach(staples) { staple in
                             HStack(spacing: 14) {
-                                Image(systemName: staple.icon)
+                                Image(systemName: staple.safeIcon)
                                     .font(.headline)
                                     .foregroundStyle(AscendTheme.emerald)
                                     .frame(width: 36, height: 36)
