@@ -14,7 +14,6 @@ public struct ActiveWorkoutPlayerView: View {
     @State private var showingFinishConfirmation = false
     @State private var showingCelebrationSheet = false
     @State private var showingFormPreview: Bool = false
-    @State private var audioCoach = WorkoutAudioCoachService.shared
     
     public init() {}
     
@@ -139,9 +138,6 @@ public struct ActiveWorkoutPlayerView: View {
                 appState.activeSession?.durationSeconds = elapsedSeconds
             }
         }
-        .onDisappear {
-            audioCoach.stopSpeaking()
-        }
     }
     
     // MARK: - Subviews
@@ -225,27 +221,6 @@ public struct ActiveWorkoutPlayerView: View {
                     }
                     
                     Spacer()
-                    
-                    // Audio Coach Quick Trigger
-                    Button {
-                        if audioCoach.isSpeaking {
-                            audioCoach.stopSpeaking()
-                        } else if let def = matchingDefinition {
-                            audioCoach.speakExerciseOverview(
-                                name: def.name,
-                                muscleGroup: def.muscleGroup.rawValue,
-                                setup: def.setupInstructions,
-                                execution: def.executionInstructions
-                            )
-                        }
-                    } label: {
-                        Image(systemName: audioCoach.isSpeaking ? "stop.fill" : "speaker.wave.2.fill")
-                            .font(.subheadline.bold())
-                            .foregroundStyle(audioCoach.isSpeaking ? AscendTheme.flame : AscendTheme.cyan)
-                            .padding(8)
-                            .background(audioCoach.isSpeaking ? AscendTheme.flame.opacity(0.15) : AscendTheme.cyan.opacity(0.15))
-                            .clipShape(Circle())
-                    }
                     
                     // Detail Form Guide
                     Button {
